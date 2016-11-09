@@ -32,9 +32,13 @@ public class DtPublicKey implements JIntIs, Serializable{
 		this.value = value;
 	}
 	
+	/**
+	 * Instantiates new type of public key.
+	 */
 	public DtPublicKey () {
 		this.value = null;
 	}
+	
 	/**
 	 * Gets the value inside the wrapper.
 	 *
@@ -44,6 +48,14 @@ public class DtPublicKey implements JIntIs, Serializable{
 		return value;
 	}
 	
+	/**
+	 * Gets public key from PtString value
+	 * 
+	 * @param pubKey PtString value of public key
+	 * @throws NoSuchAlgorithmException Thrown if transformation is null, empty, in an invalid format 
+	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
+	 * the given key, or the given key cannot be processed
+	 */
 	public DtPublicKey fromString(PtString pubKey)
 		throws NoSuchAlgorithmException, InvalidKeySpecException {
 		KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -54,6 +66,14 @@ public class DtPublicKey implements JIntIs, Serializable{
 	    return new DtPublicKey(this.value);
 	}
 	
+	/**
+	 * Gets String value of public key
+	 * 
+	 * @return String value of public key
+	 * @throws NoSuchAlgorithmException Thrown if transformation is null, empty, in an invalid format 
+	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
+	 * the given key, or the given key cannot be processed
+	 */
 	public String toStringVal()
 		throws NoSuchAlgorithmException, InvalidKeySpecException{
 		KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -63,8 +83,10 @@ public class DtPublicKey implements JIntIs, Serializable{
         BigInteger prv_x = rsaPrivKey.getPublicExponent();
         
         return prv_m.toString() + "//" + prv_x.toString();
+        /*byte [] bytePublicKey =publicKey.getBytes(); 
+        return bytePublicKey.toString();*/
 	}
-
+	
 	@Override
 	public PtBoolean is() {
 		return new PtBoolean(this.value != null);

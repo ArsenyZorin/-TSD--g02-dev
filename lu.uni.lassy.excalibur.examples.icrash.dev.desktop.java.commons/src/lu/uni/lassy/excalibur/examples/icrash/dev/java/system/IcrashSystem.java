@@ -330,7 +330,7 @@ public interface IcrashSystem extends Remote {
 	 * @return The success of the method
 	 * @throws RemoteException Thrown if the server is offline
 	 */
-	public PtBoolean oeLogin(DtLogin aDtLogin,DtPassword aDtPassword) throws RemoteException; 
+	public PtBoolean oeLogin(DtLogin aDtLogin,byte[] aEncodePassword) throws RemoteException; 
 	
 	/**
 	 * Processes a logout for the current authenticating actor.

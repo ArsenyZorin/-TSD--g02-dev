@@ -41,21 +41,6 @@ public abstract class CtAuthenticated implements Serializable {
 	 *
 	 * @param aLogin The username of the user
 	 * @param aPwd The password of the user
-	 * @return The success of the initialisation of the user
-	 */
-	/*public PtBoolean init(DtLogin aLogin, DtPassword aPwd){
-		login = aLogin;
-		pwd = aPwd;
-		vpIsLogged = new PtBoolean(false);
-		return new PtBoolean(true); 
-	}*/
-	
-	/**
-	 * Initialisation of the user.
-	 * @param aId 
-	 *
-	 * @param aLogin The username of the user
-	 * @param aPwd The password of the user
 	 * @param aPubKey The public key of the user
 	 * @return The success of the initialisation of the user
 	 */

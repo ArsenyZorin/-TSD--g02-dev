@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -27,12 +29,19 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	PrivateKey value;
 	
 	/**
-	 * Instantiates new type of public key.
+	 * Instantiates new type of private key.
 	 *
-	 * @param v The value to be wrapped
+	 * @param value The value to be wrapped
 	 */
-	public DtPrivateKey(PrivateKey v){
-		value = v;
+	public DtPrivateKey(PrivateKey value){
+		this.value = value;
+	}
+	
+	/**
+	 * Instantiates new type of private key.
+	 */
+	public DtPrivateKey(){
+		value = null;
 	}
 	
 	/**
@@ -49,8 +58,16 @@ public class DtPrivateKey implements JIntIs, Serializable{
 		return new PtBoolean(this.value != null);
 	}
 	
-	public void fromString(PtString privKey)
-		throws NoSuchAlgorithmException, InvalidKeySpecException {
+	/**
+	 * Gets private key from PtString value
+	 * 
+	 * @param privKey PtString value of private key
+	 * @throws NoSuchAlgorithmException Thrown if transformation is null, empty, in an invalid format 
+	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
+	 * the given key, or the given key cannot be processed
+	 */
+	public void fromString(PtString privKey) 
+			throws NoSuchAlgorithmException, InvalidKeySpecException{
 		KeyFactory kf = KeyFactory.getInstance("RSA");
 		String[] publModExp = privKey.split("//");
 		RSAPrivateKeySpec new_pubks = new RSAPrivateKeySpec
@@ -58,6 +75,14 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	    this.value = kf.generatePrivate(new_pubks);
 	}
 	
+	/**
+	 * Gets String value of private key
+	 * 
+	 * @return String value of private key
+	 * @throws NoSuchAlgorithmException Thrown if transformation is null, empty, in an invalid format 
+	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
+	 * the given key, or the given key cannot be processed
+	 */
 	public String toStringVal()
 		throws NoSuchAlgorithmException, InvalidKeySpecException{
 		KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -69,7 +94,47 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	    return prv_m.toString() + "//" + prv_x.toString();
 	}
 	
-	public void saveToFile(PtString value) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException{
+	/**
+	 * Gets private key from file
+	 * 
+	 * @param value Login of the user
+	 * @return Private key reconstructed from file 
+	 * @throws IOException Thrown if an I/O error occurs reading from the stream
+	 * @throws NoSuchAlgorithmException Thrown if transformation is null, empty, in an invalid format 
+	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
+	 * the given key, or the given key cannot be processed
+	 */
+	public DtPrivateKey getFromFile(PtString value) 
+			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
+		File file = new File("D:" + File.separator + ".icrash_rsa" + File.separator + value.getValue()+"_rsa");
+		if(!file.exists()) return null;
+		String privKeyString = new String(Files.readAllBytes(Paths.get(file.getPath())));
+		fromString(new PtString(privKeyString));
+		return new DtPrivateKey(this.value);
+	}
+	
+	/**
+	 * Deletes file with private key 
+	 * 
+	 * @param value Login of the user
+	 */
+	public void deleteFile(PtString value)
+	{
+		File file = new File("D:" + File.separator + ".icrash_rsa" + File.separator + value.getValue()+"_rsa");
+		if(!file.exists()) return;
+		file.delete();
+	}
+	/**
+	 * Saves String value of private key to file
+	 * 
+	 * @param value Login of the user for file name
+	 * @throws IOException Thrown if an I/O error occurs reading from the stream
+	 * @throws NoSuchAlgorithmException Thrown if transformation is null, empty, in an invalid format 
+	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
+	 * the given key, or the given key cannot be processed
+	 */
+	public void saveToFile(PtString value) 
+			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		File file = new File("D:"+File.separator+".icrash_rsa");
         if(!file.exists()) file.mkdir();
         file = new File(file.getAbsolutePath() + File.separator + value.getValue()+"_rsa");

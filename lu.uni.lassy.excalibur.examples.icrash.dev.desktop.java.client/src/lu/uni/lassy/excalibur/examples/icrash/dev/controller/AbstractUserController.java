@@ -12,14 +12,24 @@
  ******************************************************************************/
 package lu.uni.lassy.excalibur.examples.icrash.dev.controller;
 
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.ServerNotBoundException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.ServerOfflineException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActProxyAuthenticated;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActProxyAuthenticated.UserType;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtKeyPair;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPrivateKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
@@ -51,12 +61,26 @@ public abstract class AbstractUserController implements HasListeners {
 	 * @return The success of the method
 	 * @throws ServerOfflineException Thrown if the server is currently offline
 	 * @throws ServerNotBoundException Thrown if the server hasn't been bound in the RMI settings
+	 * @throws IOException 
+	 * @throws InvalidKeySpecException 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws IllegalBlockSizeException 
+	 * @throws BadPaddingException 
+	 * @throws NoSuchPaddingException 
+	 * @throws InvalidKeyException 
 	 */
-	public PtBoolean oeLogin(String login, String password) throws ServerOfflineException, ServerNotBoundException{
+	public PtBoolean oeLogin(String login, String password) throws ServerOfflineException, 
+		ServerNotBoundException, NoSuchAlgorithmException, InvalidKeySpecException, IOException, 
+		InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException{
 		DtLogin aDtLogin = new DtLogin(new PtString(login));
-		DtPassword aDtPassword = new DtPassword(new PtString(password));
 		try {
-			return this.getAuth().oeLogin(aDtLogin, aDtPassword);
+			DtPrivateKey privKey = new DtPrivateKey().getFromFile(new PtString(login));
+			byte [] byteVal = password.getBytes();
+			if(!privKey.equals(null)){
+					CtKeyPair keyPair = new CtKeyPair(privKey, null);
+					byteVal = keyPair.encodeMsg(new PtString(password));
+			}
+			return this.getAuth().oeLogin(aDtLogin, byteVal);
 		} catch (RemoteException e) {
 			Log4JUtils.getInstance().getLogger().error(e);
 			throw new ServerOfflineException();

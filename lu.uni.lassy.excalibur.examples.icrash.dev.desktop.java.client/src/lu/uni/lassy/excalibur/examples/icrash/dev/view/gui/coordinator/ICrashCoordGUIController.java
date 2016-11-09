@@ -11,11 +11,19 @@
  *     Thomas Mortimer - Updated client to MVC and added new design patterns
  ******************************************************************************/
 package lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.coordinator;
+import java.io.IOException;
 import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import javafx.util.Callback;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.CoordinatorController;
@@ -457,7 +465,9 @@ public class ICrashCoordGUIController extends AbstractAuthGUIController {
 					}
 				}
 			}
-			catch (ServerOfflineException | ServerNotBoundException e) {
+			catch (ServerOfflineException | ServerNotBoundException | InvalidKeyException | 
+					NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | 
+					BadPaddingException | IllegalBlockSizeException | IOException e) {
 				showExceptionErrorMessage(e);
 			}
     	}

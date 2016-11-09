@@ -55,6 +55,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtGP
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPhoneNumber;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPrivateKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPublicKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
@@ -1105,7 +1106,7 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.java.system.IcrashSystem#oeLogin(lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin, lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword)
 	 */
 	//actAuthenticated Actor
-	public PtBoolean oeLogin(DtLogin aDtLogin, DtPassword aDtPassword)
+	public PtBoolean oeLogin(DtLogin aDtLogin, byte[] aEncodePassword)
 			throws RemoteException {		
 		try {
 			log.debug("The current requesting authenticating actor is " + currentRequestingAuthenticatedActor.getLogin().value.getValue());
@@ -1122,6 +1123,8 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 				//PreP2
 				if(ctAuthenticatedInstance.vpIsLogged.getValue())
 					throw new Exception("User " + aDtLogin.value.getValue() + " is already logged in");
+				CtKeyPair keyPair = new CtKeyPair(null, ctAuthenticatedInstance.publKey);
+				DtPassword aDtPassword = new DtPassword(keyPair.decodeMsg(aEncodePassword));
 				PtBoolean pwdCheck = ctAuthenticatedInstance.pwd.eq(aDtPassword);
 				if(pwdCheck.getValue()) {
 					//PostP1
@@ -1245,6 +1248,7 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 			if (ctAuth != null && ctAuth instanceof CtCoordinator) {
 				CtCoordinator aCtCoordinator = (CtCoordinator)ctAuth;
 				DbCoordinators.deleteCoordinator(aCtCoordinator);
+				new DtPrivateKey().deleteFile(aCtCoordinator.login.value);
 				//PostF1
 				assCtAuthenticatedActAuthenticated.remove(ctAuth);
 				cmpSystemCtAuthenticated.remove(ctAuth.login.value.getValue());
