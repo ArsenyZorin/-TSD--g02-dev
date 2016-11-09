@@ -11,19 +11,11 @@
  *     Thomas Mortimer - Updated client to MVC and added new design patterns
  ******************************************************************************/
 package lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.admin;
-import java.io.IOException;
 import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.AdminController;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.SystemStateController;
@@ -40,6 +32,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
 import lu.uni.lassy.excalibur.examples.icrash.dev.model.Message;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.AbstractAuthGUIController;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.coordinator.CreateICrashCoordGUI;
+import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.coordinator.CreateICrashCoordGUIMobile;
 import javafx.scene.layout.GridPane;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -177,6 +170,12 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 	 * We open a new window when a coordinator is created, so we also should close the window if the coordinator is deleted 
 	 */
 	private ArrayList<CreateICrashCoordGUI> listOfOpenWindows = new ArrayList<CreateICrashCoordGUI>();
+	/**
+	 * The list of open mobile windows in the system.
+	 * We open a new window when a coordinator is created, so we also should close the window if the coordinator is deleted 
+	 */
+	private ArrayList<CreateICrashCoordGUIMobile> listOfOpenMobileWindows = new ArrayList<CreateICrashCoordGUIMobile>();
+
 	/*
 	 * Methods used within the GUI
 	 */
@@ -257,7 +256,11 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 						switch(type){
 						case Add:
 							if (userController.oeAddCoordinator(txtfldUserID.getText(), txtfldUserName.getText(), psswrdfldPassword.getText()).getValue()){
+								
 								listOfOpenWindows.add(new CreateICrashCoordGUI(coordID, systemstateController.getActCoordinator(txtfldUserName.getText())));
+								
+								listOfOpenMobileWindows.add(new CreateICrashCoordGUIMobile(coordID, systemstateController.getActCoordinator(txtfldUserName.getText())));
+								
 								anchrpnCoordinatorDetails.getChildren().remove(grdpn);
 							}
 							else
@@ -269,13 +272,19 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 									if (window.getDtCoordinatorID().value.getValue().equals(coordID.value.getValue()))
 										window.closeWindow();
 								}
+
+								for(CreateICrashCoordGUIMobile window : listOfOpenMobileWindows){
+									if (window.getDtCoordinatorID().value.getValue().equals(coordID.value.getValue()))
+										window.closeWindow();
+								}
+								
 								anchrpnCoordinatorDetails.getChildren().remove(grdpn);
 							}
 							else
 								showErrorMessage("Unable to delete coordinator", "An error occured when deleting the coordinator");
 							break;
 						}
-					} catch (ServerOfflineException | ServerNotBoundException | IncorrectFormatException | NoSuchAlgorithmException | IOException | InvalidKeySpecException e) {
+					} catch (ServerOfflineException | ServerNotBoundException | IncorrectFormatException e) {
 						showExceptionErrorMessage(e);
 					}					
 				}
@@ -299,9 +308,7 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 				if (userController.oeLogin(txtfldAdminUserName.getText(), psswrdfldAdminPassword.getText()).getValue())
 					logonShowPanes(true);
 			}
-			catch (ServerOfflineException | ServerNotBoundException | InvalidKeyException | 
-					NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | 
-					BadPaddingException | IllegalBlockSizeException | IOException e) {
+			catch (ServerOfflineException | ServerNotBoundException e) {
 				showExceptionErrorMessage(e);
 			}	
     	}
