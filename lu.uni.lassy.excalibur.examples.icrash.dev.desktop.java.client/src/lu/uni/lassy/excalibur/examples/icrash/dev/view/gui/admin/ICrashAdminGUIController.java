@@ -11,19 +11,11 @@
  *     Thomas Mortimer - Updated client to MVC and added new design patterns
  ******************************************************************************/
 package lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.admin;
-import java.io.IOException;
 import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.AdminController;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.SystemStateController;
@@ -292,7 +284,7 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 								showErrorMessage("Unable to delete coordinator", "An error occured when deleting the coordinator");
 							break;
 						}
-					} catch (ServerOfflineException | ServerNotBoundException | IncorrectFormatException | NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
+					} catch (ServerOfflineException | ServerNotBoundException | IncorrectFormatException e) {
 						showExceptionErrorMessage(e);
 					}					
 				}
@@ -316,7 +308,7 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 				if (userController.oeLogin(txtfldAdminUserName.getText(), psswrdfldAdminPassword.getText()).getValue())
 					logonShowPanes(true);
 			}
-			catch (ServerOfflineException | ServerNotBoundException | InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | IOException e) {
+			catch (ServerOfflineException | ServerNotBoundException e) {
 				showExceptionErrorMessage(e);
 			}	
     	}
