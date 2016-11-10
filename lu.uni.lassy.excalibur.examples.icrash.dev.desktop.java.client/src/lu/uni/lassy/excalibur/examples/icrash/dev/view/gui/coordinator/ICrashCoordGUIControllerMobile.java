@@ -1,9 +1,17 @@
 package lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.coordinator;
+import java.io.IOException;
 import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import javafx.util.Callback;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.CoordinatorController;
@@ -167,13 +175,16 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	public void logon() {
 		if(txtfldCoordLogonUserName.getText().length() > 0 && psswrdfldCoordLogonPassword.getText().length() > 0){
 			try {
-				if (userController.oeLogin(txtfldCoordLogonUserName.getText(), psswrdfldCoordLogonPassword.getText()).getValue()){
+				if (userController.oeLogin(txtfldCoordLogonUserName.getText(), 
+						psswrdfldCoordLogonPassword.getText()).getValue()){
 					if (userController.getUserType() == UserType.Coordinator){
 						logonShowPanes(true);
 					}
 				}
 			}
-			catch (ServerOfflineException | ServerNotBoundException e) {
+			catch (ServerOfflineException | ServerNotBoundException | InvalidKeyException 
+					| NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException 
+					| BadPaddingException | IllegalBlockSizeException | IOException e) {
 				showExceptionErrorMessage(e);
 			}
     	}
