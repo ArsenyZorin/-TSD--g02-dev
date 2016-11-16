@@ -1,4 +1,4 @@
-package lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary;
+package lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -9,8 +9,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.design.JIntIs;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 
 /**
  * The Class PtPublicKey to wrap type of public key.
@@ -59,7 +57,7 @@ public class DtPublicKey implements JIntIs, Serializable{
 	public DtPublicKey fromString(PtString pubKey)
 		throws NoSuchAlgorithmException, InvalidKeySpecException {
 		KeyFactory kf = KeyFactory.getInstance("RSA");
-		String[] publModExp = pubKey.split("//");
+		String[] publModExp = pubKey.getValue().split("//");
 		RSAPublicKeySpec new_pubks = new RSAPublicKeySpec
 			(new BigInteger(publModExp[0]), new BigInteger(publModExp[1]));
 	    this.value = kf.generatePublic(new_pubks);
@@ -74,7 +72,7 @@ public class DtPublicKey implements JIntIs, Serializable{
 	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
 	 * the given key, or the given key cannot be processed
 	 */
-	public String toStringVal()
+	public PtString toStringVal()
 		throws NoSuchAlgorithmException, InvalidKeySpecException{
 		KeyFactory kf = KeyFactory.getInstance("RSA");
 		RSAPublicKeySpec rsaPrivKey = kf.getKeySpec(value, RSAPublicKeySpec.class);
@@ -82,9 +80,7 @@ public class DtPublicKey implements JIntIs, Serializable{
         BigInteger prv_m = rsaPrivKey.getModulus();
         BigInteger prv_x = rsaPrivKey.getPublicExponent();
         
-        return prv_m.toString() + "//" + prv_x.toString();
-        /*byte [] bytePublicKey =publicKey.getBytes(); 
-        return bytePublicKey.toString();*/
+        return new PtString(prv_m.toString() + "//" + prv_x.toString());
 	}
 	
 	@Override

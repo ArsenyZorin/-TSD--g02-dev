@@ -33,15 +33,6 @@ public class PtString implements Serializable {
 	public PtString(String v){
 		value = v;
 	}
-	
-	/**
-	 * Splits this string around matches of the given regular expression.
-	 * @param regex - The delimiting regular expression
-	 * @return The array of strings computed by splitting this string around matches of the given regular expression
-	 */
-	public String[] split(String regex){
-		return value.split(regex);
-	}
 
 	/**
 	 * Gets the value inside the wrapper.

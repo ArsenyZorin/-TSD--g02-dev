@@ -13,6 +13,8 @@
 package lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary;
 
 import java.io.Serializable;
+
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPublicKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 
 /**

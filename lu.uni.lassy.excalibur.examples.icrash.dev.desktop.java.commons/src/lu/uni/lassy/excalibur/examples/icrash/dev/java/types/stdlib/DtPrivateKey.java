@@ -1,4 +1,4 @@
-package lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary;
+package lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +14,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.design.JIntIs;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 
 /**
  * The Class PtPublicKey to wrap type of private key.
@@ -66,13 +64,14 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
 	 * the given key, or the given key cannot be processed
 	 */
-	public void fromString(PtString privKey) 
+	public DtPrivateKey fromString(PtString privKey) 
 			throws NoSuchAlgorithmException, InvalidKeySpecException{
 		KeyFactory kf = KeyFactory.getInstance("RSA");
-		String[] publModExp = privKey.split("//");
+		String[] publModExp = privKey.getValue().split("//");
 		RSAPrivateKeySpec new_pubks = new RSAPrivateKeySpec
 			(new BigInteger(publModExp[0]), new BigInteger(publModExp[1]));
 	    this.value = kf.generatePrivate(new_pubks);
+	    return new DtPrivateKey(this.value);
 	}
 	
 	/**
@@ -83,7 +82,7 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
 	 * the given key, or the given key cannot be processed
 	 */
-	public String toStringVal()
+	public PtString toStringVal()
 		throws NoSuchAlgorithmException, InvalidKeySpecException{
 		KeyFactory kf = KeyFactory.getInstance("RSA");
 		RSAPrivateKeySpec rsaPrivKey = kf.getKeySpec(value, RSAPrivateKeySpec.class);
@@ -91,7 +90,7 @@ public class DtPrivateKey implements JIntIs, Serializable{
 		BigInteger prv_m = rsaPrivKey.getModulus();
 	    BigInteger prv_x = rsaPrivKey.getPrivateExponent();
 	        
-	    return prv_m.toString() + "//" + prv_x.toString();
+	    return new PtString(prv_m.toString() + "//" + prv_x.toString());
 	}
 	
 	/**
@@ -140,7 +139,7 @@ public class DtPrivateKey implements JIntIs, Serializable{
         file = new File(file.getAbsolutePath() + File.separator + value.getValue()+"_rsa");
         if(!file.exists()) file.createNewFile();
         PrintWriter pwr = new PrintWriter(file.getAbsoluteFile());
-        pwr.print(new DtPrivateKey(this.value).toStringVal());
+        pwr.print(new DtPrivateKey(this.value).toStringVal().getValue());
         pwr.close();
 	}
 }
