@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.IcrashSystem;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtEncodedPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
@@ -67,7 +68,7 @@ public abstract class ActAuthenticatedImpl extends UnicastRemoteObject
 	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActAuthenticated#oeLogin(lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin, lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword)
 	 */
 	synchronized public PtBoolean oeLogin(DtLogin aDtLogin,
-			byte[] aEncodePassword) throws RemoteException, NotBoundException {
+			DtEncodedPassword aEncodePassword) throws RemoteException, NotBoundException {
 
 		Logger log = Log4JUtils.getInstance().getLogger();
 

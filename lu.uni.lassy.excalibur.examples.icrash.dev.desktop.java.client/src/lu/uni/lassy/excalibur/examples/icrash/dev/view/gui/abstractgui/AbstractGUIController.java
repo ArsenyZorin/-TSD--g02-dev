@@ -354,7 +354,7 @@ public abstract class AbstractGUIController implements Initializable {
 		publicKeyCol.setCellValueFactory(new Callback<CellDataFeatures<CtCoordinator, String>, ObservableValue<String>>() {
 			public ObservableValue<String> call(CellDataFeatures<CtCoordinator, String> coord) {
 				try{
-					return new ReadOnlyObjectWrapper<String>(coord.getValue().publKey.toStringVal());
+					return new ReadOnlyObjectWrapper<String>(coord.getValue().publKey.toStringVal().getValue());
 				}catch(Exception e){
 					return null;
 				}

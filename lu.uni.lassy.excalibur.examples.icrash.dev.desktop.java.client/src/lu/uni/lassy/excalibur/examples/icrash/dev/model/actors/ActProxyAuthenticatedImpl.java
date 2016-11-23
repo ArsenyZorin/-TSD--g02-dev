@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.*;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtEncodedPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
@@ -73,7 +74,7 @@ public abstract class ActProxyAuthenticatedImpl extends UnicastRemoteObject impl
 	/* (non-Javadoc)
 	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActProxyAuthenticated#oeLogin(lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin, lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword)
 	 */
-	public PtBoolean oeLogin(DtLogin aDtLogin,byte[] aEncodePassword)  throws RemoteException, NotBoundException{
+	public PtBoolean oeLogin(DtLogin aDtLogin,DtEncodedPassword aEncodePassword)  throws RemoteException, NotBoundException{
 		return this._serverSideActor.oeLogin(aDtLogin, aEncodePassword);
 	}
 	

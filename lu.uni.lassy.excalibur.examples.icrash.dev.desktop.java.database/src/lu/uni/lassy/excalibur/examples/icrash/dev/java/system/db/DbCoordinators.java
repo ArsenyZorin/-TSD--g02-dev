@@ -23,7 +23,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCo
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPublicKey;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPublicKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 
@@ -51,7 +51,7 @@ public class DbCoordinators extends DbAbstract{
 				String id = aCtCoordinator.id.value.getValue();
 				String login =  aCtCoordinator.login.value.getValue();
 				String pwd =  aCtCoordinator.pwd.value.getValue();
-				String pubKey = aCtCoordinator.publKey.toStringVal();
+				String pubKey = aCtCoordinator.publKey.toStringVal().getValue();
 	
 				log.debug("[DATABASE]-Insert coordinator");
 				int val = st.executeUpdate("INSERT INTO "+ dbName+ ".coordinators" +

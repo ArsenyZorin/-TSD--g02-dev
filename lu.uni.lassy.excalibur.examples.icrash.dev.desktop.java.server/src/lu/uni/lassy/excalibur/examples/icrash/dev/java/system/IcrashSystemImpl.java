@@ -55,8 +55,8 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtGP
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPhoneNumber;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPrivateKey;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPublicKey;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPrivateKey;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPublicKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisType;
@@ -64,6 +64,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtHu
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.secondary.DtSMS;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtDate;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtDateAndTime;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtEncodedPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtInteger;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtSecond;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtTime;
@@ -1106,7 +1107,7 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.java.system.IcrashSystem#oeLogin(lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin, lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword)
 	 */
 	//actAuthenticated Actor
-	public PtBoolean oeLogin(DtLogin aDtLogin, byte[] aEncodePassword)
+	public PtBoolean oeLogin(DtLogin aDtLogin, DtEncodedPassword aEncodePassword)
 			throws RemoteException {		
 		try {
 			log.debug("The current requesting authenticating actor is " + currentRequestingAuthenticatedActor.getLogin().value.getValue());

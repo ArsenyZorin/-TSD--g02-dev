@@ -29,7 +29,8 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActPro
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActProxyAuthenticated.UserType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtKeyPair;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPrivateKey;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtEncodedPassword;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPrivateKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
@@ -75,12 +76,12 @@ public abstract class AbstractUserController implements HasListeners {
 		DtLogin aDtLogin = new DtLogin(new PtString(login));
 		try {
 			DtPrivateKey privKey = new DtPrivateKey().getFromFile(new PtString(login));
-			byte [] byteVal = password.getBytes();
+			DtEncodedPassword encodedPwd = new DtEncodedPassword(password.getBytes());
 			if(!privKey.equals(null)){
 					CtKeyPair keyPair = new CtKeyPair(privKey, null);
-					byteVal = keyPair.encodeMsg(new PtString(password));
+					encodedPwd = keyPair.encodeMsg(new PtString(password));
 			}
-			return this.getAuth().oeLogin(aDtLogin, byteVal);
+			return this.getAuth().oeLogin(aDtLogin, encodedPwd);
 		} catch (RemoteException e) {
 			Log4JUtils.getInstance().getLogger().error(e);
 			throw new ServerOfflineException();

@@ -18,6 +18,7 @@ import java.rmi.RemoteException;
 
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.design.JIntIsActor;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtEncodedPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 
@@ -43,7 +44,7 @@ public interface ActAuthenticated extends java.rmi.Remote, Serializable, JIntIsA
 	 * @throws RemoteException Thrown if the server isn't online
 	 * @throws NotBoundException Thrown if the server has not been bound in the RMI settings
 	 */
-	public PtBoolean oeLogin(DtLogin aDtLogin,byte[] aEncodePassword) throws RemoteException, NotBoundException;
+	public PtBoolean oeLogin(DtLogin aDtLogin,DtEncodedPassword aEncodePassword) throws RemoteException, NotBoundException;
 	
 	/**
 	 * Allows a user to logoff to the system.

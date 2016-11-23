@@ -8,6 +8,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtEncodedPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPrivateKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPublicKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
@@ -85,13 +86,14 @@ public class CtKeyPair implements Serializable{
 	 * 
 	 * @throws NoSuchAlgorithmException Thrown if there is no such algorithm in getInstance()
 	 */
-	public void getKeys()
+	public CtKeyPair getKeys()
 		throws NoSuchAlgorithmException{
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         this.pubKey = new DtPublicKey(keyPair.getPublic());
         this.privKey = new DtPrivateKey(keyPair.getPrivate());
+        return new CtKeyPair(this.privKey, this.pubKey);
 	}
 	
 	/**
@@ -108,13 +110,13 @@ public class CtKeyPair implements Serializable{
 	 * @throws BadPaddingException Thrown if cipher is in decryption mode, and (un)padding has been requested, 
 	 * but the decrypted data is not bounded by the appropriate padding bytes
 	 */
-	public byte[] encodeMsg(PtString msg)
+	public DtEncodedPassword encodeMsg(PtString msg)
 		throws NoSuchAlgorithmException, NoSuchPaddingException, 
 		InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
 		
 		Cipher ciph = Cipher.getInstance("RSA");
         ciph.init(Cipher.ENCRYPT_MODE, this.privKey.getValue());
-        return ciph.doFinal(msg.getValue().getBytes());
+        return new DtEncodedPassword(ciph.doFinal(msg.getValue().getBytes()));
 	}
 	
 	/**
@@ -131,12 +133,12 @@ public class CtKeyPair implements Serializable{
 	 * @throws BadPaddingException Thrown if cipher is in decryption mode, and (un)padding has been requested, 
 	 * but the decrypted data is not bounded by the appropriate padding bytes
 	 */
-	public PtString decodeMsg(byte[] msg) 
+	public PtString decodeMsg(DtEncodedPassword msg) 
 			throws NoSuchAlgorithmException, NoSuchPaddingException, 
 			InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
 		Cipher ciph = Cipher.getInstance("RSA");
 		ciph.init(Cipher.DECRYPT_MODE, this.pubKey.getValue());
-        return new PtString(new String(ciph.doFinal(msg)));
+        return new PtString(new String(ciph.doFinal(msg.getValue())));
 	}
 }

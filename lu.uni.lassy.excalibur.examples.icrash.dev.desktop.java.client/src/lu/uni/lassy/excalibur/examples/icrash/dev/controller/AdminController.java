@@ -29,7 +29,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtKe
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
-import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPublicKey;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPublicKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;

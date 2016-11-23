@@ -42,6 +42,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCr
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtHumanKind;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtDate;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtDateAndTime;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtEncodedPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPublicKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtTime;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
@@ -330,7 +331,7 @@ public interface IcrashSystem extends Remote {
 	 * @return The success of the method
 	 * @throws RemoteException Thrown if the server is offline
 	 */
-	public PtBoolean oeLogin(DtLogin aDtLogin,byte[] aEncodePassword) throws RemoteException; 
+	public PtBoolean oeLogin(DtLogin aDtLogin,DtEncodedPassword aEncodePassword) throws RemoteException; 
 	
 	/**
 	 * Processes a logout for the current authenticating actor.
