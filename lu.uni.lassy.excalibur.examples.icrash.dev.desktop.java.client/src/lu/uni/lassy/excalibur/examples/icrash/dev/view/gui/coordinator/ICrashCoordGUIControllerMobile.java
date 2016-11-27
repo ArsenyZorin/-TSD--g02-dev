@@ -1,9 +1,17 @@
 package lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.coordinator;
+import java.io.IOException;
 import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import javafx.util.Callback;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.CoordinatorController;
@@ -26,6 +34,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.AbstractA
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
@@ -69,6 +78,31 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	@FXML
 	private AnchorPane anpnCoordUserData;
 
+	/** The alerts pane that holds alerts. */
+	@FXML
+	private AnchorPane anpnCoordShowAlerts;
+	
+	/** The crises pane that holds crises. */
+	@FXML
+	private AnchorPane anpnCoordShowCrises;
+
+	/** The info pane. */
+	@FXML
+	private Pane pnInformationError;
+
+	/** The error pane. */
+	@FXML
+	private Pane pnError;
+	
+	/** Back to data user. */
+	@FXML
+	private Button bttnCrisesBack;
+
+	/** Back to data user. */
+	@FXML
+	private Button bttnAlertsBack;
+	
+	
     /** The textfield for entering in the username for logging on. */
     @FXML
     private TextField txtfldCoordLogonUserName;
@@ -103,7 +137,11 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 
     /** The button that shows to user crisis. */
     @FXML
-    private Button bttnCoordShowCrisis;
+    private Button bttnCoordShowCrises;
+    
+    /** The label with information about updating information. */
+    @FXML
+    private Label lblUpdateMessage;
     
 
     /**
@@ -133,6 +171,7 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
      */
     @FXML
     void bttnCoordSaveUpdates_OnClick(ActionEvent event) {
+    	lblUpdateMessage.setVisible(true);
     }
     
     /**
@@ -142,6 +181,7 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
      */
     @FXML
     void bttnCoordShowAlerts_OnClick(ActionEvent event) {
+    	showAlertsPanes(true);
     }
     
     /**
@@ -150,9 +190,30 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
      * @param event The event type fired, we do not need it's details
      */
     @FXML
-    void bttnCoordShowCrisis_OnClick(ActionEvent event) {
+    void bttnCoordShowCrises_OnClick(ActionEvent event) {
+    	showCrisesPanes(true);
     }
     
+    /**
+     * Button show user data
+     *
+     * @param event The event type fired, we do not need it's details
+     */
+    @FXML
+    void bttnCrisesBack_OnClick(ActionEvent event) {
+    	showUserDataPanes(true);
+    }
+    
+    /**
+     * Button show user data
+     *
+     * @param event The event type fired, we do not need it's details
+     */
+    @FXML
+    	
+    void bttnAlertsBack_OnClick(ActionEvent event) {
+    	showUserDataPanes(true);
+    }
     /*
      * These are other classes accessed by this controller
      */
@@ -169,11 +230,11 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 			try {
 				if (userController.oeLogin(txtfldCoordLogonUserName.getText(), psswrdfldCoordLogonPassword.getText()).getValue()){
 					if (userController.getUserType() == UserType.Coordinator){
-						logonShowPanes(true);
+						showUserDataPanes(true);
 					}
 				}
 			}
-			catch (ServerOfflineException | ServerNotBoundException e) {
+			catch (ServerOfflineException | ServerNotBoundException | InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | IOException e) {
 				showExceptionErrorMessage(e);
 			}
     	}
@@ -188,33 +249,100 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	public void logoff() {
 		try {
 			if (userController.oeLogout().getValue()){
-				logonShowPanes(false);
+				logonShowPanes(true);
 			}
 		} catch (ServerOfflineException | ServerNotBoundException e) {
 			showExceptionErrorMessage(e);
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.AbstractAuthGUIController#logonShowPanes(boolean)
+
+	@Override
+	protected void logonShowPanes(boolean loggedOn) {
+		showLogonPanes(loggedOn);
+	}
+
+	/**
+	 * Show logon panes and hide all another.
 	 */
-	protected void logonShowPanes(boolean loggedOn){
-		anpnCoordUserData.setVisible(loggedOn);
-		bttnCoordLogoff.setDisable(!loggedOn);
-		bttnCoordSaveUpdates.setDisable(!loggedOn);
-		bttnCoordShowAlerts.setDisable(!loggedOn);
-		bttnCoordShowCrisis.setDisable(!loggedOn);
-		anpnLogon.setVisible(!loggedOn);
-		bttnCoordLogon.setDefaultButton(!loggedOn);
-		if (loggedOn){
-		}
-		else{
+	protected void showLogonPanes(boolean flag){
+		setDisVisLogon(flag);
+		setDisVisUserData(!flag);
+		setDisVisAlerts(!flag);
+		setDisVisCrises(!flag);
+	}
+	
+	/**
+	 * Show user data panes and hide all another.
+	 */
+	protected void showUserDataPanes(boolean flag){
+		setDisVisLogon(!flag);
+		setDisVisUserData(flag);
+		setDisVisAlerts(!flag);
+		setDisVisCrises(!flag);
+	}
+	
+
+	/**
+	 * Show alerts panes and hide all another.
+	 */
+	protected void showAlertsPanes(boolean flag){
+		setDisVisLogon(!flag);
+		setDisVisUserData(!flag);
+		setDisVisAlerts(flag);
+		setDisVisCrises(!flag);
+	}
+	
+
+	/**
+	 * Show crises panes and hide all another.
+	 */
+	protected void showCrisesPanes(boolean flag){
+		setDisVisLogon(!flag);
+		setDisVisUserData(!flag);
+		setDisVisAlerts(!flag);
+		setDisVisCrises(flag);
+	}
+	
+
+	/**
+	 * Show or hide logon panes.
+	 */
+	private void setDisVisLogon(boolean flag){
+		anpnLogon.setDisable(!flag);
+		anpnLogon.setVisible(flag);
+		if (flag) {
 			txtfldCoordLogonUserName.setText("");
 			psswrdfldCoordLogonPassword.setText("");
-			txtfldCoordLogonUserName.requestFocus();	
+			txtfldCoordLogonUserName.requestFocus();
 		}
 	}
 
+	/**
+	 * Show or hide user data panes.
+	 */
+	private void setDisVisUserData(boolean flag){
+		anpnCoordUserData.setDisable(!flag);
+		anpnCoordUserData.setVisible(flag);
+	}
+
+	/**
+	 * Show or hide alerts panes.
+	 */
+	private void setDisVisAlerts(boolean flag){
+		anpnCoordShowAlerts.setDisable(!flag);
+		anpnCoordShowAlerts.setVisible(flag);
+	}
+
+	/**
+	 * Show or hide crises panes.
+	 */
+	private void setDisVisCrises(boolean flag){
+		anpnCoordShowCrises.setDisable(!flag);
+		anpnCoordShowCrises.setVisible(flag);
+	}
+		
+	
 	/* (non-Javadoc)
 	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.AbstractGUIController#closeForm()
 	 */
@@ -231,7 +359,7 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	public void initialize(URL location, ResourceBundle resources) {
 		setUpTables();
 		
-		logonShowPanes(false);
+		showLogonPanes(true);
 	}
 
 	@Override
@@ -289,4 +417,5 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 		// TODO Auto-generated method stub
 		
 	}
+
 }
