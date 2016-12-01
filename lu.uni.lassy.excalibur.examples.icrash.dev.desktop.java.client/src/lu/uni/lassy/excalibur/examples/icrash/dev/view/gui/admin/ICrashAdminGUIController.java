@@ -40,6 +40,7 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
 import lu.uni.lassy.excalibur.examples.icrash.dev.model.Message;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.AbstractAuthGUIController;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.coordinator.CreateICrashCoordGUI;
+import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.coordinator.CreateICrashCoordGUIMobile;
 import javafx.scene.layout.GridPane;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -177,6 +178,12 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 	 * We open a new window when a coordinator is created, so we also should close the window if the coordinator is deleted 
 	 */
 	private ArrayList<CreateICrashCoordGUI> listOfOpenWindows = new ArrayList<CreateICrashCoordGUI>();
+	
+	/**
+	 * The list of open mobile windows in the system.
+	 * We open a new window when a coordinator is created, so we also should close the window if the coordinator is deleted 
+	 */
+	private ArrayList<CreateICrashCoordGUIMobile> listOfOpenMobileWindows = new ArrayList<CreateICrashCoordGUIMobile>();
 	/*
 	 * Methods used within the GUI
 	 */
@@ -258,6 +265,7 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 						case Add:
 							if (userController.oeAddCoordinator(txtfldUserID.getText(), txtfldUserName.getText(), psswrdfldPassword.getText()).getValue()){
 								listOfOpenWindows.add(new CreateICrashCoordGUI(coordID, systemstateController.getActCoordinator(txtfldUserName.getText())));
+								listOfOpenMobileWindows.add(new CreateICrashCoordGUIMobile(coordID, systemstateController.getActCoordinator(txtfldUserName.getText())));
 								anchrpnCoordinatorDetails.getChildren().remove(grdpn);
 							}
 							else

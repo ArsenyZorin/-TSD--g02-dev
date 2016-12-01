@@ -11,6 +11,7 @@ import javax.crypto.NoSuchPaddingException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtEncodedPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPrivateKey;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPublicKey;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 
 /**
@@ -25,25 +26,10 @@ public class CtKeyPair implements Serializable{
 	DtPublicKey pubKey;
 	/** The private key. */
 	DtPrivateKey privKey;
-	
-	/**
-	 * Instantiates a new classtype of the key pair
-	 */
-	public CtKeyPair() {
-		pubKey = null;
-		privKey = null;
-	}
-	
-	/**
-	 * Instantiates a new classtype of the key pair
-	 * 
-	 * @param privKey Private key
-	 * @param pubKey Public key
-	 */
-	public CtKeyPair(DtPrivateKey privKey, DtPublicKey pubKey) {
-		this.privKey = privKey;
-		this.pubKey = pubKey;
-	}
+	/** The message that needs to be encoded */
+	PtString decodedMsg;
+	/** The message that needs to be decoded */
+	DtEncodedPassword encodedMsg;
 	
 	/**
 	 * Getter for public key
@@ -62,45 +48,55 @@ public class CtKeyPair implements Serializable{
 	public DtPrivateKey getPrivateKey(){
 		return this.privKey;
 	}
+
+	public PtString getDecodedMsg(){
+		return this.decodedMsg;
+	}
 	
+	public DtEncodedPassword getEncodedMsg(){
+		return this.encodedMsg;
+	}
 	/**
-	 * Setter for public key
+	 * Instantiates a new classtype of the key pair for encoding
 	 * 
 	 * @param value Public key
 	 */
-	public void setPublicKey(DtPublicKey value){
-		pubKey = value;
+	public void initForEncode(DtPrivateKey privKey, PtString decodedMsg){
+		this.privKey = privKey;
+		this.decodedMsg = decodedMsg;
 	}
 	
 	/**
-	 * Setter for private key
+	 * Instantiates a new classtype of the key pair for decoding
 	 * 
-	 * @param value Private key
+	 * @param privKey Private key
+	 * @param encodedMsg Message that needs to be decoded
 	 */
-	public void setPrivateKey(DtPrivateKey value){
-		privKey = value;
+	public void initForDecode(DtPublicKey pubKey, DtEncodedPassword encodedMsg){
+		this.pubKey = pubKey;
+		this.encodedMsg = encodedMsg;
 	}
 	
 	/**
 	 * Generates a pair of keys. Public and private
 	 * 
+	 * @return true if keys were successfully generated
 	 * @throws NoSuchAlgorithmException Thrown if there is no such algorithm in getInstance()
 	 */
-	public CtKeyPair getKeys()
+	public PtBoolean getKeys()
 		throws NoSuchAlgorithmException{
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         this.pubKey = new DtPublicKey(keyPair.getPublic());
         this.privKey = new DtPrivateKey(keyPair.getPrivate());
-        return new CtKeyPair(this.privKey, this.pubKey);
+        return new PtBoolean(this.pubKey.is().getValue() && this.privKey.is().getValue());
 	}
 	
 	/**
 	 * Encodes the message with the private key
 	 * 
-	 * @param msg Message which we have to encode
-	 * @return Encoded message
+	 * @return 
 	 * @throws NoSuchAlgorithmException Thrown if transformation is null, empty, in an invalid format
 	 * @throws NoSuchPaddingException Thrown if transformation contains a padding scheme that is not available.
 	 * @throws InvalidKeyException Thrown if the public key in the given certificate is inappropriate for initializing cipher
@@ -110,19 +106,19 @@ public class CtKeyPair implements Serializable{
 	 * @throws BadPaddingException Thrown if cipher is in decryption mode, and (un)padding has been requested, 
 	 * but the decrypted data is not bounded by the appropriate padding bytes
 	 */
-	public DtEncodedPassword encodeMsg(PtString msg)
+	public PtBoolean encodeMsg()
 		throws NoSuchAlgorithmException, NoSuchPaddingException, 
 		InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
 		
 		Cipher ciph = Cipher.getInstance("RSA");
         ciph.init(Cipher.ENCRYPT_MODE, this.privKey.getValue());
-        return new DtEncodedPassword(ciph.doFinal(msg.getValue().getBytes()));
+        this.encodedMsg = new DtEncodedPassword(ciph.doFinal(this.decodedMsg.getValue().getBytes()));
+        return this.encodedMsg.is();
 	}
 	
 	/**
 	 * Decodes encoded message with the public key
 	 * 
-	 * @param msg Encoded message which we have to decode
 	 * @return Decoded message Thrown if transformation contains a padding scheme that is not available.
 	 	 * @throws NoSuchAlgorithmException Thrown if transformation is null, empty, in an invalid format
 	 * @throws NoSuchPaddingException Thrown if transformation contains a padding scheme that is not available.
@@ -133,12 +129,13 @@ public class CtKeyPair implements Serializable{
 	 * @throws BadPaddingException Thrown if cipher is in decryption mode, and (un)padding has been requested, 
 	 * but the decrypted data is not bounded by the appropriate padding bytes
 	 */
-	public PtString decodeMsg(DtEncodedPassword msg) 
+	public PtBoolean decodeMsg() 
 			throws NoSuchAlgorithmException, NoSuchPaddingException, 
 			InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
 		Cipher ciph = Cipher.getInstance("RSA");
 		ciph.init(Cipher.DECRYPT_MODE, this.pubKey.getValue());
-        return new PtString(new String(ciph.doFinal(msg.getValue())));
+        this.decodedMsg = new PtString(new String(ciph.doFinal(this.encodedMsg.getValue())));
+        return new PtBoolean(!this.decodedMsg.getValue().isEmpty());
 	}
 }

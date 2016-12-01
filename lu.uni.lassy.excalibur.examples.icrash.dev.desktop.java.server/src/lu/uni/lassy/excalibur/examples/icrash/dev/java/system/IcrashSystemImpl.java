@@ -1124,9 +1124,10 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 				//PreP2
 				if(ctAuthenticatedInstance.vpIsLogged.getValue())
 					throw new Exception("User " + aDtLogin.value.getValue() + " is already logged in");
-				CtKeyPair keyPair = new CtKeyPair(null, ctAuthenticatedInstance.publKey);
-				DtPassword aDtPassword = new DtPassword(keyPair.decodeMsg(aEncodePassword));
-				PtBoolean pwdCheck = ctAuthenticatedInstance.pwd.eq(aDtPassword);
+				CtKeyPair keyPair = new CtKeyPair();
+				keyPair.initForDecode(ctAuthenticatedInstance.publKey, aEncodePassword);
+				keyPair.decodeMsg();
+				PtBoolean pwdCheck = ctAuthenticatedInstance.pwd.eq(new DtPassword(keyPair.getDecodedMsg()));
 				if(pwdCheck.getValue()) {
 					//PostP1
 					/**

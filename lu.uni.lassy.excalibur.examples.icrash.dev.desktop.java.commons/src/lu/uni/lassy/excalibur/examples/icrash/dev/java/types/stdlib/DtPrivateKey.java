@@ -35,13 +35,10 @@ public class DtPrivateKey implements JIntIs, Serializable{
 		this.value = value;
 	}
 	
-	/**
-	 * Instantiates new type of private key.
-	 */
-	public DtPrivateKey(){
-		value = null;
-	}
 	
+	public DtPrivateKey(){
+		this.value = null;
+	}
 	/**
 	 * Gets the value inside the wrapper.
 	 *
@@ -64,14 +61,14 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
 	 * the given key, or the given key cannot be processed
 	 */
-	public DtPrivateKey fromString(PtString privKey) 
+	public PtBoolean fromString(PtString privKey)  
 			throws NoSuchAlgorithmException, InvalidKeySpecException{
 		KeyFactory kf = KeyFactory.getInstance("RSA");
 		String[] publModExp = privKey.getValue().split("//");
 		RSAPrivateKeySpec new_pubks = new RSAPrivateKeySpec
 			(new BigInteger(publModExp[0]), new BigInteger(publModExp[1]));
 	    this.value = kf.generatePrivate(new_pubks);
-	    return new DtPrivateKey(this.value);
+	    return new PtBoolean(true);
 	}
 	
 	/**
@@ -103,13 +100,13 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	 * @throws InvalidKeySpecException Thrown  if the requested key specification is inappropriate for 
 	 * the given key, or the given key cannot be processed
 	 */
-	public DtPrivateKey getFromFile(PtString value) 
+	public PtBoolean getFromFile(PtString value) 
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
 		File file = new File("D:" + File.separator + ".icrash_rsa" + File.separator + value.getValue()+"_rsa");
 		if(!file.exists()) return null;
 		String privKeyString = new String(Files.readAllBytes(Paths.get(file.getPath())));
 		fromString(new PtString(privKeyString));
-		return new DtPrivateKey(this.value);
+		return new PtBoolean(true);
 	}
 	
 	/**
@@ -119,7 +116,7 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	 */
 	public void deleteFile(PtString value)
 	{
-		File file = new File("D:" + File.separator + ".icrash_rsa" + File.separator + value.getValue()+"_rsa");
+		File file = new File("D" + File.separator + ".icrash_rsa" + File.separator + value.getValue()+"_rsa");
 		if(!file.exists()) return;
 		file.delete();
 	}

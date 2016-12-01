@@ -75,11 +75,14 @@ public abstract class AbstractUserController implements HasListeners {
 		InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException{
 		DtLogin aDtLogin = new DtLogin(new PtString(login));
 		try {
-			DtPrivateKey privKey = new DtPrivateKey().getFromFile(new PtString(login));
+			DtPrivateKey privKey = new DtPrivateKey();
+			privKey.getFromFile(new PtString(login));
 			DtEncodedPassword encodedPwd = new DtEncodedPassword(password.getBytes());
-			if(!privKey.equals(null)){
-					CtKeyPair keyPair = new CtKeyPair(privKey, null);
-					encodedPwd = keyPair.encodeMsg(new PtString(password));
+			if(!privKey.getValue().equals(null)){
+					CtKeyPair keyPair = new CtKeyPair();
+					keyPair.initForEncode(privKey, new PtString(password));
+					keyPair.encodeMsg();
+					encodedPwd = keyPair.getEncodedMsg();
 			}
 			return this.getAuth().oeLogin(aDtLogin, encodedPwd);
 		} catch (RemoteException e) {
