@@ -24,6 +24,9 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActPro
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.design.JIntIs;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtAlertID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtComment;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCrisisID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
@@ -238,6 +241,19 @@ public class CoordinatorController extends AbstractUserController {
 			} catch (NotBoundException e) {
 				Log4JUtils.getInstance().getLogger().error(e);
 				throw new ServerNotBoundException();
+			}
+		}
+		return new PtBoolean(false);
+	}
+	
+	public PtBoolean oeSaveUpdates(DtCoordinatorID aID, DtCoordinatorFirstName aFirstName, DtCoordinatorLastName aLastName) throws ServerOfflineException, ServerNotBoundException, NotBoundException{
+		if (this.getUserType() == UserType.Coordinator){
+			ActProxyCoordinator actCoord = (ActProxyCoordinator)this.getAuth();
+			try {
+				return actCoord.oeSaveUpdates(aID, aFirstName, aLastName);
+			} catch (RemoteException e) {
+				Log4JUtils.getInstance().getLogger().error(e);
+				throw new ServerOfflineException();
 			}
 		}
 		return new PtBoolean(false);

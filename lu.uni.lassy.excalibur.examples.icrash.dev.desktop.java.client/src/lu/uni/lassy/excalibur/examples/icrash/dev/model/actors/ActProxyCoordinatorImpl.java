@@ -22,6 +22,9 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtAl
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCrisis;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtAlertID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtComment;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCrisisID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
@@ -70,7 +73,16 @@ public class ActProxyCoordinatorImpl extends ActProxyAuthenticatedImpl
 		else
 			return new PtBoolean(false);
 	}
-
+	
+	synchronized public PtBoolean oeSaveUpdates(DtCoordinatorID aID, DtCoordinatorFirstName aFirstName, DtCoordinatorLastName aLastName) throws RemoteException, NotBoundException{
+		if (getServerSideActor() != null){
+			return ((ActCoordinator) getServerSideActor())
+					.oeSaveUpdates(aID, aFirstName, aLastName);
+		}
+		else
+			return new PtBoolean(false);
+	}
+	
 	/* (non-Javadoc)
 	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActProxyCoordinator#oeGetAlertsSet(lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus)
 	 */

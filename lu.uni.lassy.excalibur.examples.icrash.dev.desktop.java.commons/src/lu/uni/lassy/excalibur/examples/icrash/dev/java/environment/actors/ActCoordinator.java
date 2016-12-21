@@ -19,6 +19,9 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtAl
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCrisis;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtAlertID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtComment;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCrisisID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
@@ -50,6 +53,8 @@ public interface ActCoordinator extends ActAuthenticated {
 	 */
 	public PtBoolean oeGetAlertsSet(EtAlertStatus aEtAlertStatus) throws RemoteException, NotBoundException;
 	
+	
+	//public PtBoolean oeSaveUpdates(DtCoordinatorID aID, DtCoordinatorFirstName aFirstName, DtCoordinatorLastName aLastName);
 	/**
 	 * Sets the crisis' handler, with the ID passed, as the current user.
 	 *
@@ -123,6 +128,8 @@ public interface ActCoordinator extends ActAuthenticated {
 	 */
 	public PtBoolean oeCloseCrisis(DtCrisisID aDtCrisisID) throws RemoteException, NotBoundException;
 
+	
+	public PtBoolean oeSaveUpdates(DtCoordinatorID aID, DtCoordinatorFirstName aDtFirstName, DtCoordinatorLastName aDtLastName) throws RemoteException, NotBoundException;
 	/**
 	 * A message and crisis is received by the user.
 	 *

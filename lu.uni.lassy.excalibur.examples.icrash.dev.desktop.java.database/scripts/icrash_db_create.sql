@@ -91,6 +91,8 @@ CREATE TABLE `coordinators` (
  `id` varchar(80) NOT NULL,
   `login` varchar(80) DEFAULT NULL,
   `pwd` varchar(80) DEFAULT NULL,
+  `firstName` varchar(30) DEFAULT " ",
+  `lastName` varchar(30) DEFAULT " ",
   `pubKey` text DEFAULT NULL,
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

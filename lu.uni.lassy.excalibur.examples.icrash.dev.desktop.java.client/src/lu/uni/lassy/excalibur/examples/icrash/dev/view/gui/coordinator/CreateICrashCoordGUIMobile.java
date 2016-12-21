@@ -64,6 +64,7 @@ public class CreateICrashCoordGUIMobile  implements CreatedWindows {
             stage.setScene(new Scene(root));
             stage.show();
             ((ICrashCoordGUIControllerMobile)loader.getController()).setActor(aActCoordinator);
+            ((ICrashCoordGUIControllerMobile)loader.getController()).getCoordinatorID(_aDtCoordinatorID);
             ((ICrashCoordGUIControllerMobile)loader.getController()).setWindow(stage);
             stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override

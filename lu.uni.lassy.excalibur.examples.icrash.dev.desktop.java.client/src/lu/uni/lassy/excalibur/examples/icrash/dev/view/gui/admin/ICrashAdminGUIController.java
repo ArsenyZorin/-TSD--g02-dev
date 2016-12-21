@@ -197,8 +197,8 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 		bttnAdminLogoff.setDisable(!loggedOn);
 		bttnAdminLogin.setDefaultButton(!loggedOn);
 		if (!loggedOn){
-			txtfldAdminUserName.setText("");
-			psswrdfldAdminPassword.setText("");
+			txtfldAdminUserName.setText("icrashadmin");
+			psswrdfldAdminPassword.setText("7WXC1359");
 			txtfldAdminUserName.requestFocus();
 			for (int i = anchrpnCoordinatorDetails.getChildren().size() -1; i >= 0; i--)
 				anchrpnCoordinatorDetails.getChildren().remove(i);
@@ -273,7 +273,7 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 							break;
 						case Delete:
 							if (userController.oeDeleteCoordinator(txtfldUserID.getText()).getValue()){
-								for(CreateICrashCoordGUI window : listOfOpenWindows){
+								for(CreateICrashCoordGUIMobile window : listOfOpenMobileWindows){
 									if (window.getDtCoordinatorID().value.getValue().equals(coordID.value.getValue()))
 										window.closeWindow();
 								}
@@ -305,7 +305,7 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 		if(txtfldAdminUserName.getText().length() > 0 && psswrdfldAdminPassword.getText().length() > 0){
 			try {
 				if (userController.oeLogin(txtfldAdminUserName.getText(), psswrdfldAdminPassword.getText()).getValue())
-					logonShowPanes(true);
+						logonShowPanes(true);
 			}
 			catch (ServerOfflineException | ServerNotBoundException | InvalidKeyException | 
 					NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | 
@@ -357,6 +357,7 @@ public class ICrashAdminGUIController extends AbstractAuthGUIController {
 			if (actor instanceof ActAdministrator)
 				try{
 					userController = new AdminController((ActAdministrator)actor);
+					listOfOpenMobileWindows.add(new CreateICrashCoordGUIMobile(new DtCoordinatorID(new PtString("1")), systemstateController.getActCoordinator("az")));
 					try{
 						userController.getAuthImpl().listOfMessages.addListener(new ListChangeListener<Message>() {
 							@Override

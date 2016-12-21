@@ -26,7 +26,10 @@ public class CtCoordinator extends CtAuthenticated {
 
 	/** The id of the coordinator. */
 	public DtCoordinatorID id;
-		
+	
+	public DtCoordinatorFirstName firstName;
+	
+	public DtCoordinatorLastName lastName;
 	/**
 	 * Initialises the coordinator.
 	 *
@@ -35,17 +38,14 @@ public class CtCoordinator extends CtAuthenticated {
 	 * @param aPwd The password of the coordinator
 	 * @return The success of the initialisation
 	 */
-	public PtBoolean init(DtCoordinatorID aId,DtLogin aLogin,DtPassword aPwd, DtPublicKey aPubKey){
+	public PtBoolean init(DtCoordinatorID aId,DtLogin aLogin,DtPassword aPwd,DtCoordinatorFirstName aFirstName, DtCoordinatorLastName aLastName, DtPublicKey aPubKey){
 			super.init(aLogin, aPwd, aPubKey);
 			id = aId;
+			firstName = aFirstName;
+			lastName = aLastName;
 			return new PtBoolean(true); 
 	}
-	
-	/*public PtBoolean init(DtCoordinatorID aId,DtLogin aLogin,DtPassword aPwd){
-		super.init(aLogin, aPwd);
-		id = aId;
-		return new PtBoolean(true); 
-	}*/
+
 	/**
 	 * Updates the user details, used when the administrator does an update on the coordinator.
 	 *
@@ -56,6 +56,12 @@ public class CtCoordinator extends CtAuthenticated {
 	public PtBoolean update(DtLogin aLogin,DtPassword aPwd){
 		login = aLogin;
 		pwd = aPwd;
+		return new PtBoolean(true);
+	}
+	
+	public PtBoolean update(DtCoordinatorFirstName aFirstName, DtCoordinatorLastName aLastName){
+		firstName = aFirstName;
+		lastName = aLastName;
 		return new PtBoolean(true);
 	}
 	

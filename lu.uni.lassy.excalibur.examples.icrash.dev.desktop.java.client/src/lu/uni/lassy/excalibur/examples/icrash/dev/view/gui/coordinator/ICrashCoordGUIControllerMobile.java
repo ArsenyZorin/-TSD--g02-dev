@@ -13,30 +13,44 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import com.sun.javafx.tk.Toolkit.Task;
+import com.sun.xml.internal.bind.v2.runtime.Coordinator;
+
 import javafx.util.Callback;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.CoordinatorController;
+import lu.uni.lassy.excalibur.examples.icrash.dev.controller.SystemStateController;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.IncorrectActorException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.IncorrectFormatException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.ServerNotBoundException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.controller.exceptions.ServerOfflineException;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActCoordinator;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActProxyCoordinator;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.environment.actors.ActProxyAuthenticated.UserType;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.design.JIntIsActor;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtAlert;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCoordinator;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCrisis;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtBoolean;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.PtString;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.utils.Log4JUtils;
 import lu.uni.lassy.excalibur.examples.icrash.dev.model.actors.ActProxyCoordinatorImpl;
 import lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.AbstractAuthGUIController;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
@@ -48,6 +62,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -76,9 +91,17 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	@FXML
 	private AnchorPane anpnCoordShowAlerts;
 	
+	/** The alerts pane that holds alert's information. */
+	@FXML
+	private AnchorPane anpnCoordAlertInfo;
+	
 	/** The crises pane that holds crises. */
 	@FXML
 	private AnchorPane anpnCoordShowCrises;
+	
+	/** The crisis pane that holds crisis information. */
+	@FXML
+	private AnchorPane anpnCoordCrisisInfo;
 	
 	/** The crises pane that holds crisis management buttons. */
 	@FXML
@@ -91,10 +114,6 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	/** Pane for crisis mode switcher. */
 	@FXML
 	private AnchorPane anpnSwitcherCrises;
-
-	/** Pane for crisis mode switcher. */
-	@FXML
-	private AnchorPane anpnSwitcherAlerts;
 	
 	/** The info pane. */
 	@FXML
@@ -103,6 +122,14 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	/** The error pane. */
 	@FXML
 	private Pane pnError;
+	
+	/** The error pane. */
+	@FXML
+	private Pane pnAlertError;
+	
+	/** The crisis error pane. */
+	@FXML
+	private Pane pnCrisisError;
 	
 	@FXML
 	private Pane pnLogin;
@@ -113,6 +140,14 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	/** Back to data user. */
 	@FXML
 	private Button bttnAlertsBack;
+	
+	/** Back to alerts table. */
+	@FXML
+	private Button bttnAlertInfoBack;
+	
+	/** Back to crisises table. */
+	@FXML
+	private Button bttnCrisisInfoBack;
 
     /** The button that allows a user to initiate the log on function. */
     @FXML
@@ -136,7 +171,7 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
     
     /** The button that close pop-up menu. */
     @FXML
-    private Button bttnCloseCrisisMenu;
+    private Button bttnChangeStatus;
 
     /** The button that close pop-up menu. */
     @FXML
@@ -152,7 +187,7 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 
     /** The button that allows a user to change the status of a crisis. */
     @FXML
-    private Button bttnChangeStatus;
+    private Button bttnChangeCrisisStatus;
     
     /** The button that allows a user to close a crisis. */
     @FXML
@@ -160,17 +195,20 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
     
     /** The button that allows validation of the alert. */
     @FXML
-    private Button bttnValidate;
+    private Button bttnAlertValidate;
     
     /** The button that allows invalidation of the alert. */
     @FXML
-    private Button bttnInvalidate;
+    private Button bttnAlertInvalidate;
     
-    // Switch change status show alerts 
-    private SwitchButtonAlerts switchShowAlertsStatusButton;
-
-    // Switch change status showed crises 
-    private SwitchButtonCrises switchShowCrisesStatusButton;
+    @FXML
+    private ChoiceBox<EtAlertStatus> choiceAlertStatus;
+    
+    @FXML
+    private ChoiceBox<EtCrisisStatus> choiceCrisisStatus;
+    
+    @FXML
+    private ChoiceBox<EtCrisisStatus> menuChangeCrisisStatus;
 
     /** The passwordfield for entering in the password for logging on. */
     @FXML
@@ -192,9 +230,55 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
     @FXML
     private TextField txtfldFocus;
     
+    /** The label for alert id. */
+    @FXML
+    private Label labelAlertID;
+    
+    /** The label for alert status. */
+    @FXML
+    private Label labelAlertStatus;
+    
+    /** The label for alert time. */
+    @FXML
+    private Label labelAlertDateTime;
+    
+    /** The label for alert location. */
+    @FXML
+    private Label labelAlertLocation;
+    
+    /** The text area for alert comment. */
+    @FXML
+    private TextArea textAreaAlertComment;
+    
+    /** The label for crisis id. */
+    @FXML
+    private Label labelCrisisID;
+    
+    /** The label for crisis status. */
+    @FXML
+    private Label labelCrisisStatus;
+    
+    @FXML
+    private Label labelChangeID;
+    
+    /** The label for crisis time. */
+    @FXML
+    private Label labelCrisisDateTime;
+    
+    /** The label for crisis location. */
+    @FXML
+    private Label labelCrisisLocation;
+    
+    /** The text area for crisis report. */
+    @FXML
+    private TextArea textAreaCrisisReport;
+    
     /** The pane with information about updating information. */
     @FXML
     private Pane pnUpdateMessage;
+    
+    @FXML
+    private Pane pnChangeCrisisStatus;
     
     /** The Pane with information about updating information. */
     @FXML
@@ -207,6 +291,8 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
     /** The tableview of the alerts the user has retrieved from the system. */
     @FXML
     private TableView<CtAlert> tblvwAlerts;
+    
+    private DtCoordinatorID currentCoordID;
     
     /**
      * Button event that deals with logging off the user
@@ -233,18 +319,18 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
      *
      * @param event The event type fired, we do not need it's details
      * @throws InterruptedException 
+     * @throws ServerOfflineException 
+     * @throws ServerNotBoundException 
+     * @throws RemoteException 
      */
     @FXML
-    void bttnCoordSaveUpdates_OnClick(ActionEvent event) throws InterruptedException {
+    void bttnCoordSaveUpdates_OnClick(ActionEvent event) throws InterruptedException, RemoteException, ServerNotBoundException, ServerOfflineException {
+    	    	
     	if(txtfldCoordLogonFirstName.getText().length() == 0 
     			|| txtfldCoordLogonLastName.getText().length() == 0){
-    		pnInformationError.setVisible(true);
-       	}
-    	else{
-    	if(pnInformationError.isVisible()==true)
-    		pnInformationError.setVisible(false);
-    		pnUpdateMessage.setVisible(true);
-    	}
+    		showUpdateError();
+       	}    	
+    	saveCoordinatorUpdates();
     }
     
     /**
@@ -287,6 +373,15 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
     	showUserDataPanes(true);
     }
     
+    @FXML
+    void bttnAlertInfoBack_OnClick(ActionEvent event) {
+    	showAlertsPanes(true);
+    }
+    
+    @FXML
+    void bttnCrisisInfoBack_OnClick(ActionEvent event) {
+    	showCrisesPanes(true);
+    }
     
     /**
      * Mouse click to table view action in crises
@@ -295,17 +390,22 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
      */
     @FXML
     void tblvwCrisis_OnClick(MouseEvent event) {
-		int rowIndex = tblvwCrisis.getSelectionModel().selectedIndexProperty().get();
-		System.out.println("rowIndex = " + rowIndex + ", tblviewCrisis size = " + 										tblvwCrisis.getSelectionModel().getTableView().getItems().size());	
-		
-		
-		if ((rowIndex < 0) || (rowIndex > tblvwCrisis.getSelectionModel().getTableView().getItems().size())) {
-			System.out.println("rowIndex is wrong : " + rowIndex);
-			return;
+    	if(tblvwCrisis.getItems().isEmpty()) return;
+		int clickCount = event.getClickCount();
+		if(clickCount < 1) return;
+		CtCrisis crisis = (CtCrisis)getObjectFromTableView(tblvwCrisis);
+		labelCrisisID.setText(crisis.id.toString());
+		labelCrisisStatus.setText(crisis.status.toString());
+		labelCrisisDateTime.setText(crisis.instant.toString());
+		labelCrisisLocation.setText(crisis.location.longitude.value.getValue() + 
+				", " + crisis.location.latitude.value.getValue());
+		try{
+		textAreaCrisisReport.setText(crisis.comment.value.getValue());
 		}
-		
-		anpnCrisisButtons.setVisible(true);
-		anpnCrisisButtons.setDisable(false);
+		catch (NullPointerException e){
+			e.getMessage();
+		}
+		showCrisisInfoPanes(true);
     }
     
     /**
@@ -315,17 +415,26 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
      */
     @FXML
     void tblvwAlerts_OnClick(MouseEvent event) {
-		int rowIndex = tblvwCrisis.getSelectionModel().selectedIndexProperty().get();
-		System.out.println("rowIndex = " + rowIndex + ", tblvwAlerts size = " + 										tblvwAlerts.getSelectionModel().getTableView().getItems().size());	
+    	if(tblvwAlerts.getItems().isEmpty()) return;
+		int clickCount = event.getClickCount();
+		if(clickCount < 1) return;
+		CtAlert alert = ((CtAlert)getObjectFromTableView(tblvwAlerts)); 
+		labelAlertID.setText(alert.id.toString());
+		labelAlertStatus.setText(alert.status.toString());
+		labelAlertDateTime.setText(alert.instant.toString());
+		labelAlertLocation.setText(alert.location.longitude.value.getValue() + ", " + tblvwAlerts.getSelectionModel().getSelectedItem().location.latitude.value.getValue());
+		textAreaAlertComment.setText(alert.comment.toString());
 		
-		
-		if ((rowIndex < 0) || (rowIndex > tblvwAlerts.getSelectionModel().getTableView().getItems().size())) {
-			System.out.println("rowIndex is wrong : " + rowIndex);
-			return;
+		if(labelAlertStatus.getText().equals("valid")) {
+			bttnAlertValidate.setDisable(true);
+			bttnAlertInvalidate.setDisable(false);
+		}
+		else if (labelAlertStatus.getText().equals("invalid")) {
+			bttnAlertValidate.setDisable(false);
+			bttnAlertInvalidate.setDisable(true);
 		}
 		
-		anpnAlertButtons.setVisible(true);
-		anpnAlertButtons.setDisable(false);
+		showAlertInfoPanes(true);
     }
     
     /**
@@ -355,20 +464,27 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
      * @param event The event type fired, we do not need it's details
      */
     @FXML
-    void bttnReport_OnClick(ActionEvent event) {
-    	reportOnCrisis();
+    void bttnCrisisReport_OnClick(MouseEvent event) {
+    	if(!textAreaCrisisReport.isEditable())
+    		textAreaCrisisReport.setEditable(true);
+    	else
+    		reportOnCrisis();
     }
-    
+
     /**
      * Button event that deals with changing the status of a crisis
      *
      * @param event The event type fired, we do not need it's details
      */
     @FXML
-    void bttnChangeStatus_OnClick(ActionEvent event) {
-    	changeCrisisStatus();
+    void bttnChangeCrisisStatus_OnClick(MouseEvent event) {
+    	setDisVisChangeStatus(true);
     }
     
+    @FXML
+    void bttnChangeStatus_OnClick(MouseEvent event) {
+    	changeCrisisStatus();
+    }
     /**
      * Button event that deals with closing a crisis
      *
@@ -385,10 +501,14 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
      * @param event The event type fired, we do not need it's details
      */
     @FXML
-    void bttnValidate_OnClick(ActionEvent event) {
+    void bttnAlertValidate_OnClick(MouseEvent event) {
     	validateAlert();
     }
     
+    @FXML
+    void bttnInvalidate_OnClick(MouseEvent event) {
+    	invalidateAlert();
+    }
     /**
      * Button event that deals with invalidating of an alert
      *
@@ -410,6 +530,10 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 		anpnAlertButtons.setDisable(true);
     }
     
+    @FXML
+    void bttnCloseChangeWindow_OnClick(MouseEvent event){
+    	setDisVisChangeStatus(false);
+    }
     /*
      * These are other classes accessed by this controller
      */
@@ -424,21 +548,7 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	*/ 
 	private void populateCrisis(){
 		try {
-			switch(switchShowCrisesStatusButton.switchPosProperty().get()) {
-			case 1:
-				userController.oeGetCrisisSet(EtCrisisStatus.pending);
-				break;
-			case 2:
-				userController.oeGetCrisisSet(EtCrisisStatus.handled);
-				break;
-			case 3:
-				userController.oeGetCrisisSet(EtCrisisStatus.solved);
-				break;
-			case 4:
-				userController.oeGetCrisisSet(EtCrisisStatus.closed);
-				break;
-			}
-			
+			userController.oeGetCrisisSet(choiceCrisisStatus.getValue());
 		} catch (ServerOfflineException | ServerNotBoundException e) {
 			showServerOffLineMessage(e);
 		}
@@ -449,18 +559,7 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	*/
 	private void populateAlerts(){
 		try {
-			switch(switchShowAlertsStatusButton.switchPosProperty().get()) {
-			case 1:
-				userController.oeGetAlertSet(EtAlertStatus.pending);
-				break;
-			case 2:
-				userController.oeGetAlertSet(EtAlertStatus.valid);
-				break;
-			case 3:
-				userController.oeGetAlertSet(EtAlertStatus.invalid);
-				break;
-			}
-			
+			userController.oeGetAlertSet(choiceAlertStatus.getValue());
 		} catch (ServerOfflineException | ServerNotBoundException e) {
 			showServerOffLineMessage(e);
 		}
@@ -506,48 +605,14 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	 * Runs the function that will allow the current user to report on the selected crisis.
 	 */
 	private void reportOnCrisis(){
-		CtCrisis crisis = (CtCrisis)getObjectFromTableView(tblvwCrisis);
-		if (crisis != null)
-		{
-			Dialog<PtBoolean> dialog = new Dialog<PtBoolean>();
-			TextField txtfldCtCrisisID = new TextField();
-			txtfldCtCrisisID.setText(crisis.id.value.getValue());
-			txtfldCtCrisisID.setDisable(true);
-			TextArea txtarCtCrisisReport = new TextArea();
-			txtarCtCrisisReport.setPromptText("Enter in report");
-			ButtonType bttntypReportOK = new ButtonType("Report", ButtonData.OK_DONE);
-			ButtonType bttntypeReportCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-			GridPane grdpn = new GridPane();
-			grdpn.add(txtfldCtCrisisID, 1, 1);
-			grdpn.add(txtarCtCrisisReport, 1, 2);
-			dialog.getDialogPane().setContent(grdpn);
-			dialog.getDialogPane().getButtonTypes().add(bttntypeReportCancel);
-			dialog.getDialogPane().getButtonTypes().add(bttntypReportOK);
-			dialog.setResultConverter(new Callback<ButtonType, PtBoolean>(){
-
-				@Override
-				public PtBoolean call(ButtonType param) {
-					if (param.getButtonData() == ButtonData.OK_DONE && checkIfAllDialogHasBeenFilledIn(grdpn)){
-						try {
-							return userController.reportOnCrisis(crisis.id.value.getValue(), txtarCtCrisisReport.getText());
-						} catch (ServerOfflineException | ServerNotBoundException e) {
-							showServerOffLineMessage(e);
-						} catch (IncorrectFormatException e) {
-							showWarningIncorrectInformationEntered(e);
-						}
-					}
-					//User cancelled the dialog
-					return new PtBoolean(true);
-				}
-			});
-			dialog.initOwner(window);
-			dialog.initModality(Modality.WINDOW_MODAL);
-			Optional<PtBoolean> result = dialog.showAndWait();
-			if (result.isPresent()){
-				if (!result.get().getValue())
-					showWarningMessage("Unable to report on crisis", "Unable to report on the crisis, please try again");
-			}
+		try {
+			userController.reportOnCrisis(labelCrisisID.getText(), textAreaCrisisReport.getText());
+		} catch (ServerOfflineException | ServerNotBoundException e) {
+			showServerOffLineMessage(e);
+		} catch (IncorrectFormatException e) {
+			showWarningIncorrectInformationEntered(e);
 		}
+		textAreaCrisisReport.setEditable(false);
 		populateCrisis();
 	}
 	
@@ -555,81 +620,75 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	 * Runs the function that will allow the current user to change the selected crisis' status.
 	 */
 	private void changeCrisisStatus(){
-		CtCrisis crisis = (CtCrisis)getObjectFromTableView(tblvwCrisis);
-		if (crisis != null){
-			Dialog<PtBoolean> dialog = new Dialog<PtBoolean>();
-			dialog.setTitle("Change the crisis status");
-			TextField txtfldCtCrisisID = new TextField();
-			txtfldCtCrisisID.setText(crisis.id.value.getValue());
-			txtfldCtCrisisID.setDisable(true);
-			ComboBox<EtCrisisStatus> cmbbx = new ComboBox<EtCrisisStatus>();
-			cmbbx.setItems( FXCollections.observableArrayList( EtCrisisStatus.values()));
-			cmbbx.setValue(crisis.status);
-			ButtonType bttntypOK = new ButtonType("Change status", ButtonData.OK_DONE);
-			ButtonType bttntypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-			GridPane grdpn = new GridPane();
-			grdpn.add(txtfldCtCrisisID, 1, 1);
-			grdpn.add(cmbbx, 1, 2);
-			dialog.getDialogPane().setContent(grdpn);
-			dialog.getDialogPane().getButtonTypes().add(bttntypeCancel);
-			dialog.getDialogPane().getButtonTypes().add(bttntypOK);
-			dialog.setResultConverter(new Callback<ButtonType, PtBoolean>(){
-				@Override
-				public PtBoolean call(ButtonType param) {
-					if (param.getButtonData() == ButtonData.OK_DONE && checkIfAllDialogHasBeenFilledIn(grdpn)){
-						try {
-							return userController.changeCrisisStatus(crisis.id.value.getValue(), cmbbx.getValue());
-						} catch (ServerOfflineException | ServerNotBoundException e) {
-							showServerOffLineMessage(e);
-						} catch (IncorrectFormatException e) {
-							showWarningIncorrectInformationEntered(e);
-						}
-					}
-					//User cancelled the dialog
-					return new PtBoolean(true);
-				}
-			});
-			dialog.initOwner(window);
-			dialog.initModality(Modality.WINDOW_MODAL);
-			Optional<PtBoolean> result = dialog.showAndWait();
-			if (result.isPresent()){
-				if (!result.get().getValue())
-					showWarningMessage("Unable to change status of crisis", "Unable to change status of crisis, please try again");
+		try {
+			if(userController.changeCrisisStatus(labelChangeID.getText(), menuChangeCrisisStatus.getValue()).getValue()){
+				showCrisisError();
 			}
+		} catch (ServerOfflineException | ServerNotBoundException e) {
+			showServerOffLineMessage(e);
+		} catch (IncorrectFormatException e) {
+			showWarningIncorrectInformationEntered(e);
 		}
+		setDisVisChangeStatus(false);
+		setDisVisCrisisInfo(false);
+		setDisVisCrises(true);
 		populateCrisis();
+	}
+
+	protected void getCoordinatorID(DtCoordinatorID aDtCoordinatorID){
+		currentCoordID = aDtCoordinatorID;
+	}
+	
+	protected void saveCoordinatorUpdates() throws RemoteException, ServerNotBoundException, ServerOfflineException{
+			PtString firstName = new PtString(txtfldCoordLogonFirstName.getText());
+			PtString lastName = new PtString(txtfldCoordLogonLastName.getText());
+			
+			try {
+				if(userController.oeSaveUpdates(currentCoordID, new DtCoordinatorFirstName(firstName), 
+						new DtCoordinatorLastName(lastName)).getValue()){
+					showUpdateMessage();
+				}
+				else
+					showUpdateError();
+			} catch (ServerOfflineException | ServerNotBoundException | NotBoundException e) {
+				showWarningIncorrectData(e.getMessage());
+			}
+			
 	}
 	
 	/**
 	 * Runs the function that will allow the current user to validate the selected alert.
 	 */
 	private void validateAlert(){
-		CtAlert alert = (CtAlert)getObjectFromTableView(tblvwAlerts);
-		if (alert != null)
-			try {
-				userController.validateAlert(alert.id.value.getValue());
-			} catch (ServerOfflineException | ServerNotBoundException e) {
-				showServerOffLineMessage(e);
-			} catch (IncorrectFormatException e) {
-				showWarningIncorrectInformationEntered(e);
-			}
-		populateAlerts();
+		try {
+			userController.validateAlert(labelAlertID.getText());
+		} catch (ServerOfflineException | ServerNotBoundException e) {
+			showServerOffLineMessage(e);
+		} catch (IncorrectFormatException e) {
+			showWarningIncorrectInformationEntered(e);
+		}
+		
+		setDisVisAlertInfo(false);
+		setDisVisAlerts(true);
+		populateAlerts();	
 	}
 	
 	/**
 	 * Runs the function that will allow the current user to invalidate the selected alert.
 	 */
 	private void invalidateAlert(){
-		CtAlert alert = (CtAlert)getObjectFromTableView(tblvwAlerts);
-		if (alert != null)
 			try {
-				if (!userController.invalidateAlert(alert.id.value.getValue()).getValue())
-					showWarningMessage("Unable to invalidate alert", "Unable to invalidate alert, please try again");
+				if (!userController.invalidateAlert(labelAlertID.getText()).getValue()){
+					showAlertError();					
+				}
 			} catch (ServerOfflineException | ServerNotBoundException e) {
 				showServerOffLineMessage(e);
 			} catch (IncorrectFormatException e) {
 				showWarningIncorrectInformationEntered(e);
 			}
+		
+		setDisVisAlertInfo(false);
+		setDisVisAlerts(true);
 		populateAlerts();
 	}
 	
@@ -641,12 +700,12 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 		if(txtfldCoordLogonUserName.getText().length() > 0 && psswrdfldCoordLogonPassword.getText().length() > 0){
 			try {
 				if (userController.oeLogin(txtfldCoordLogonUserName.getText(), psswrdfldCoordLogonPassword.getText()).getValue()){
-					if (userController.getUserType() == UserType.Coordinator){
+					if (userController.getUserType() == UserType.Coordinator){						
 						showUserDataPanes(true);
 					}
 				}
 				else {
-					pnError.setVisible(true);
+					showLoginError();
 				}
 			}
 			catch (ServerOfflineException | ServerNotBoundException | InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | IOException e) {
@@ -654,9 +713,8 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 			}
     	}
     	else{
-    		pnError.setVisible(true);
+    		showLoginError();
     	}
-		
 	}
 
 	/* (non-Javadoc)
@@ -671,14 +729,106 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 		} catch (ServerOfflineException | ServerNotBoundException e) {
 			showExceptionErrorMessage(e);
 		}
-	}
-	
+	}	
 
 	@Override
 	protected void logonShowPanes(boolean loggedOn) {
 		showLogonPanes(loggedOn);
 	}
-
+	
+	private void showLoginError(){
+		Thread loginError = new Thread(()->
+		{
+			setDisVisLoginError(true);
+		 	try {
+				Thread.sleep(1500);
+			} catch (InterruptedException e) {
+				e.getMessage();
+			}
+		 	setDisVisLoginError(false);
+		});
+		loginError.start();
+	}
+	
+	private void showUpdateError(){
+		Thread updateError = new Thread(()->
+		{
+			setDisVisUpdateError(true);
+		 	try {
+				Thread.sleep(1500);
+			} catch (InterruptedException e) {
+				e.getMessage();
+			}
+		 	setDisVisUpdateError(false);
+		});
+		updateError.start();
+	}
+	
+	private void showUpdateMessage(){
+		Thread updateMsg = new Thread(()->
+		{
+			setDisVisUpdateInfo(true);
+		 	try {
+				Thread.sleep(1500);
+			} catch (InterruptedException e) {
+				e.getMessage();
+			}
+		 	setDisVisUpdateInfo(false);
+		});
+		updateMsg.start();
+	}
+	
+	private void showAlertError(){
+		Thread alertError = new Thread(()->
+		{
+			setDisVisAlertError(true);
+		 	try {
+				Thread.sleep(1500);
+			} catch (InterruptedException e) {
+				e.getMessage();
+			}
+		 	setDisVisAlertError(false);
+		});
+		alertError.start();
+	}
+	
+	private void showCrisisError(){
+		Thread crisisError = new Thread(()->
+		{
+			setDisVisCrisisError(true);
+		 	try {
+				Thread.sleep(1500);
+			} catch (InterruptedException e) {
+				e.getMessage();
+			}
+		 	setDisVisCrisisError(false);
+		});
+		crisisError.start();
+	}
+	
+	private void setDisVisUpdateInfo(boolean flag){
+		pnAccountDetails.setDisable(flag);
+		pnAccountDetails.setVisible(!flag);
+		pnUpdateMessage.setDisable(!flag);
+		pnUpdateMessage.setVisible(flag);
+	}
+	
+	private void setDisVisUpdateError(boolean flag){
+		pnAccountDetails.setDisable(flag);
+		pnAccountDetails.setVisible(!flag);
+		pnInformationError.setDisable(!flag);
+		pnInformationError.setVisible(flag);
+	}
+	/**
+	 * Show logon error pane and hide all another.
+	 */
+	private void setDisVisLoginError(boolean flag){
+		pnLogin.setDisable(flag);
+		pnLogin.setVisible(!flag);
+		pnError.setDisable(!flag);
+		pnError.setVisible(flag);
+	}
+	
 	/**
 	 * Show logon panes and hide all another.
 	 */
@@ -686,6 +836,7 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 		setDisVisLogon(flag);
 		setDisVisUserData(!flag);
 		setDisVisAlerts(!flag);
+		setDisVisAlertInfo(!flag);
 		setDisVisCrises(!flag);
 	}
 	
@@ -696,51 +847,52 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 		setDisVisLogon(!flag);
 		setDisVisUserData(flag);
 		setDisVisAlerts(!flag);
+		setDisVisAlertInfo(!flag);
 		setDisVisCrises(!flag);
 		pnAccountDetails.setVisible(true);
     	pnUpdateMessage.setVisible(false);
 	}
 	
-
 	/**
 	 * Show alerts panes and hide all another.
 	 */
 	protected void showAlertsPanes(boolean flag){
-		switchShowAlertsStatusButton = new SwitchButtonAlerts();
 		setDisVisLogon(!flag);
 		setDisVisUserData(!flag);
 		setDisVisAlerts(flag);
+		setDisVisAlertInfo(!flag);
 		setDisVisCrises(!flag);
-		for(int i = anpnSwitcherAlerts.getChildren().size() -1; i >= 0; i--)
-			anpnSwitcherAlerts.getChildren().remove(i);
-		
-		anpnSwitcherAlerts.getChildren().add(switchShowAlertsStatusButton);
-		AnchorPane.setTopAnchor(switchShowAlertsStatusButton, 240.0);
-		AnchorPane.setLeftAnchor(switchShowAlertsStatusButton, 20.0);
-		AnchorPane.setBottomAnchor(switchShowAlertsStatusButton, 80.0);
-		AnchorPane.setRightAnchor(switchShowAlertsStatusButton, 20.0);
+		choiceAlertStatus.getSelectionModel().select(0);
 	}
 	
+	protected void showAlertInfoPanes(boolean flag){
+		setDisVisLogon(!flag);
+		setDisVisUserData(!flag);
+		setDisVisAlerts(!flag);
+		setDisVisAlertInfo(flag);
+		setDisVisCrises(!flag);
+	}	
 
 	/**
 	 * Show crises panes and hide all another.
 	 */
 	protected void showCrisesPanes(boolean flag){
-		switchShowCrisesStatusButton = new SwitchButtonCrises();
 		setDisVisLogon(!flag);
 		setDisVisUserData(!flag);
 		setDisVisAlerts(!flag);
+		setDisVisAlertInfo(!flag);
 		setDisVisCrises(flag);
-		for(int i = anpnSwitcherCrises.getChildren().size() -1; i >= 0; i--)
-			anpnSwitcherCrises.getChildren().remove(i);
-		
-		anpnSwitcherCrises.getChildren().add(switchShowCrisesStatusButton);
-		AnchorPane.setTopAnchor(switchShowCrisesStatusButton, 240.0);
-		AnchorPane.setLeftAnchor(switchShowCrisesStatusButton, 20.0);
-		AnchorPane.setBottomAnchor(switchShowCrisesStatusButton, 80.0);
-		AnchorPane.setRightAnchor(switchShowCrisesStatusButton, 20.0);
+		setDisVisCrisisInfo(!flag);
 	}
 	
+	protected void showCrisisInfoPanes(boolean flag){
+		setDisVisLogon(!flag);
+		setDisVisUserData(!flag);
+		setDisVisAlerts(!flag);
+		setDisVisAlertInfo(!flag);
+		setDisVisCrises(!flag);
+		setDisVisCrisisInfo(flag);
+	}	
 
 	/**
 	 * Show or hide logon panes.
@@ -774,6 +926,34 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 		}
 	}
 
+	private void setDisVisCrisisError(boolean flag){
+		pnCrisisError.setDisable(!flag);
+		pnCrisisError.setVisible(flag);
+	}
+	
+	private void setDisVisAlertError(boolean flag){
+		pnAlertError.setDisable(!flag);
+		pnAlertError.setVisible(flag);
+	}
+	
+	private void setDisVisAlertInfo(boolean flag){
+		anpnCoordAlertInfo.setDisable(!flag);
+		anpnCoordAlertInfo.setVisible(flag);
+		if (flag) {
+			populateAlerts();
+		}
+	}
+	
+	private void setDisVisChangeStatus (boolean flag) {
+		pnChangeCrisisStatus.setDisable(!flag);
+		pnChangeCrisisStatus.setVisible(flag);
+		if(flag) {
+			labelChangeID.setText(labelCrisisID.getText());
+			menuChangeCrisisStatus.getSelectionModel().
+				select(EtCrisisStatus.valueOf(labelCrisisStatus.getText()));				
+		}
+	}
+
 	/**
 	 * Show or hide crises panes.
 	 */
@@ -784,9 +964,17 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 			populateCrisis();
 		}
 	}
-		
 	
-	
+	/**
+	 * Show or hide crisis information pane
+	 */
+	private void setDisVisCrisisInfo(boolean flag){
+		anpnCoordCrisisInfo.setDisable(!flag);
+		anpnCoordCrisisInfo.setVisible(flag);
+		if (flag) {
+			populateAlerts();
+		}
+	}
 	
 	/* (non-Javadoc)
 	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.view.gui.abstractgui.AbstractGUIController#closeForm()
@@ -803,7 +991,6 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		setUpTables();
-		
 		showLogonPanes(true);
 	}
 
@@ -844,7 +1031,8 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 			}
 			else
 				throw new IncorrectActorException(actor, ActCoordinator.class);
-		} catch (IncorrectActorException | ServerOfflineException | ServerNotBoundException e) {
+		} catch (IncorrectActorException | ServerOfflineException 
+				| ServerNotBoundException e) {
 			showExceptionErrorMessage(e);
 			return new PtBoolean(false);
 		}
@@ -853,10 +1041,92 @@ public class ICrashCoordGUIControllerMobile extends AbstractAuthGUIController {
 
 	@Override
 	public void setUpTables() {
-		setUpCrisesTables(tblvwCrisis);
-		setUpAlertTables(tblvwAlerts);
-		//cmbbxCrisisStatus.setItems( FXCollections.observableArrayList( EtCrisisStatus.values()));
-		//cmbbxAlertStatus.setItems( FXCollections.observableArrayList( EtAlertStatus.values()));
+		setUpCrisisTableMobile(tblvwCrisis);
+		setUpAlertTableMobile(tblvwAlerts);
+		setUpAlertsChoiceBox();
+		setUpCrisisChoiceBox();		
+	}
+
+	public void setUpAlertsChoiceBox(){
+		choiceAlertStatus.setItems(FXCollections.
+				observableArrayList( EtAlertStatus.values()));	
+		choiceAlertStatus.getSelectionModel().select(0);
+		choiceAlertStatus.getSelectionModel().selectedItemProperty()
+			.addListener((ObservableValue<? extends EtAlertStatus> observable, 
+					EtAlertStatus oldValue, EtAlertStatus newValue) -> 
+			populateAlerts() );
+	}
+	
+	public void setUpCrisisChoiceBox(){
+		choiceCrisisStatus.setItems(FXCollections.
+				observableArrayList(EtCrisisStatus.values()));
+		choiceCrisisStatus.getSelectionModel().select(0);
+		choiceCrisisStatus.getSelectionModel().selectedItemProperty()
+			.addListener((ObservableValue<? extends EtCrisisStatus> observable, 
+					EtCrisisStatus oldValue, EtCrisisStatus newValue) -> 
+			populateCrisis());
+		menuChangeCrisisStatus.setItems(FXCollections.
+				observableArrayList(EtCrisisStatus.values()));
+		menuChangeCrisisStatus.getSelectionModel().select(0);
+	}
+	
+	public void setUpCrisisTableMobile(TableView<CtCrisis> tblvw){
+		TableColumn<CtCrisis, String> idCol = 
+				new TableColumn<CtCrisis, String>("ID");
+		TableColumn<CtCrisis, String> statusCol = 
+				new TableColumn<CtCrisis, String>("Date and time");
+		idCol.setCellValueFactory(new Callback<CellDataFeatures<CtCrisis, 
+				String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(CellDataFeatures<CtCrisis, 
+					String> crisis) {
+				return new ReadOnlyObjectWrapper<String>(crisis.getValue()
+						.id.value.getValue());
+			}
+		});
+		statusCol.setCellValueFactory(new Callback<CellDataFeatures<CtCrisis, 
+				String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(CellDataFeatures<CtCrisis, 
+					String> crisis) {
+				return new ReadOnlyObjectWrapper<String>(crisis.getValue()
+						.instant.toString());
+			}
+		});
+		tblvw.getColumns().add(idCol);
+		tblvw.getColumns().add(statusCol);
+		setColumnsSameWidth(tblvw);
+	}
+	
+	public void setUpAlertTableMobile(TableView<CtAlert> tblvw){
+		TableColumn<CtAlert, String> idCol = new TableColumn<CtAlert, 
+				String>("ID");
+		TableColumn<CtAlert, String> statusCol = new TableColumn<CtAlert, 
+				String>("Date and time");
+		idCol.setCellValueFactory(new Callback<CellDataFeatures<CtAlert, 
+				String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(CellDataFeatures<CtAlert, 
+					String> alert) {
+				return new ReadOnlyObjectWrapper<String>(alert.getValue()
+						.id.value.getValue());
+			}
+		});
+		statusCol.setCellValueFactory(new Callback<CellDataFeatures<CtAlert, 
+				String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(CellDataFeatures<CtAlert, 
+					String> alert) {
+				return new ReadOnlyObjectWrapper<String>(alert.getValue()
+						.instant.toString());
+			}
+		});
+		tblvw.getColumns().add(idCol);
+		tblvw.getColumns().add(statusCol);
+		setColumnsSameWidth(tblvw);
+	}
+	
+	private void setColumnsSameWidth(TableView<?> tblvw){
+		for(TableColumn<?,?> col : tblvw.getColumns()){
+			col.prefWidthProperty().bind(tblvw.widthProperty()
+					.divide( tblvw.getColumns().size()));
+		}
 	}
 
 }

@@ -76,7 +76,8 @@ public abstract class AbstractUserController implements HasListeners {
 		DtLogin aDtLogin = new DtLogin(new PtString(login));
 		try {
 			DtPrivateKey privKey = new DtPrivateKey();
-			privKey.getFromFile(new PtString(login));
+			if(!privKey.getFromFile(new PtString(login)).getValue()) 
+				return new PtBoolean (false);
 			DtEncodedPassword encodedPwd = new DtEncodedPassword(password.getBytes());
 			if(!privKey.getValue().equals(null)){
 					CtKeyPair keyPair = new CtKeyPair();

@@ -20,7 +20,9 @@ import java.sql.Statement;
 import java.util.Hashtable;
 
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCoordinator;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtPassword;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtPublicKey;
@@ -51,12 +53,14 @@ public class DbCoordinators extends DbAbstract{
 				String id = aCtCoordinator.id.value.getValue();
 				String login =  aCtCoordinator.login.value.getValue();
 				String pwd =  aCtCoordinator.pwd.value.getValue();
+				String firstName = aCtCoordinator.firstName.value.getValue().isEmpty() ? "noName" : aCtCoordinator.firstName.value.getValue();
+				String lastName = aCtCoordinator.lastName.value.getValue().isEmpty() ? "noName" : aCtCoordinator.lastName.value.getValue();
 				String pubKey = aCtCoordinator.publKey.toStringVal().getValue();
 	
 				log.debug("[DATABASE]-Insert coordinator");
 				int val = st.executeUpdate("INSERT INTO "+ dbName+ ".coordinators" +
-											"(id,login,pwd,pubKey)" + 
-											"VALUES("+"'"+id+"'"+",'"+login+"','"+pwd+"','"+pubKey+"')");
+											"(id,login,pwd,lastName, firstName,pubKey)" + 
+											"VALUES("+"'"+id+"'"+",'"+login+"','"+pwd+"','"+firstName+"','"+lastName+"','"+pubKey+"')");
 				
 				log.debug(val + " row affected");
 			}
@@ -106,10 +110,14 @@ public class DbCoordinators extends DbAbstract{
 					DtLogin aLogin = new DtLogin(new PtString(res.getString("login")));
 					//coordinator's pwd
 					DtPassword aPwd = new DtPassword(new PtString(res.getString("pwd")));
+					//coordinator's first name
+					DtCoordinatorFirstName aFirstName = new DtCoordinatorFirstName(new PtString(res.getString("firstName")));
+					//coordinator's last name
+					DtCoordinatorLastName aLastName = new DtCoordinatorLastName(new PtString(res.getString("lastName")));
 					//coordinator's public key
 					DtPublicKey aPubKey = new DtPublicKey().fromString(new PtString(res.getString("pubKey")));
 
-					aCtCoordinator.init(aId, aLogin, aPwd, aPubKey);
+					aCtCoordinator.init(aId, aLogin, aPwd, aFirstName, aLastName, aPubKey);
 					
 				}
 								
@@ -184,10 +192,11 @@ public class DbCoordinators extends DbAbstract{
 				String id = aCtCoordinator.id.value.getValue();
 				String login =  aCtCoordinator.login.value.getValue();
 				String pwd =  aCtCoordinator.pwd.value.getValue();
+				String firstName = aCtCoordinator.firstName.value.getValue().isEmpty() ? "noName" : aCtCoordinator.firstName.value.getValue();
+				String lastName = aCtCoordinator.lastName.value.getValue().isEmpty() ? "noName" : aCtCoordinator.lastName.value.getValue();
 				String pubKey =  aCtCoordinator.publKey.getValue().toString();
 				String statement = "UPDATE "+ dbName+ ".coordinators" +
-						" SET pwd='"+pwd+"',  login='"+ login+"' " +
-						"',  pubKey='"+ pubKey+"' "+
+						" SET pwd='"+pwd+"',  login='"+ login+"',  firstName='" + firstName+ "',  lastName='" + lastName+"', pubKey='"+ pubKey+"' "+
 						"WHERE id='"+id+"'";
 				int val = st.executeUpdate(statement);
 				log.debug(val+" row updated");
@@ -236,9 +245,11 @@ public class DbCoordinators extends DbAbstract{
 							res.getString("id")));
 					DtLogin aLogin = new DtLogin(new PtString(res.getString("login")));
 					DtPassword aPwd = new DtPassword(new PtString(res.getString("pwd")));
+					DtCoordinatorFirstName aFirstName = new DtCoordinatorFirstName(new PtString(res.getString("pwd")));
+					DtCoordinatorLastName aLastName = new DtCoordinatorLastName(new PtString(res.getString("pwd")));
 					DtPublicKey aPubKey = new DtPublicKey().fromString(new PtString(res.getString("pubKey")));
 					//init aCtAlert instance
-					aCtCoord.init(aId, aLogin, aPwd, aPubKey);
+					aCtCoord.init(aId, aLogin, aPwd, aFirstName, aLastName, aPubKey);
 					
 					//add instance to the hash
 					cmpSystemCtCoord

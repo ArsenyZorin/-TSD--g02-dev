@@ -20,6 +20,9 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtAl
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCrisis;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtAlertID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtComment;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCrisisID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtCrisisStatus;
@@ -51,6 +54,8 @@ public interface ActProxyCoordinator extends ActProxyAuthenticated {
 	 * @throws NotBoundException Thrown if the server has not been bound correctly in RMI settings
 	 */
 	public PtBoolean oeGetAlertsSet(EtAlertStatus aEtAlertStatus) throws RemoteException, NotBoundException;
+	
+	public PtBoolean oeSaveUpdates(DtCoordinatorID aID, DtCoordinatorFirstName aDtCoordinatorFirstName, DtCoordinatorLastName aDtCoordinatorLastName) throws RemoteException, NotBoundException;
 	
 	/**
 	 * Sets the crisis' handler, with the ID passed, as the current user.

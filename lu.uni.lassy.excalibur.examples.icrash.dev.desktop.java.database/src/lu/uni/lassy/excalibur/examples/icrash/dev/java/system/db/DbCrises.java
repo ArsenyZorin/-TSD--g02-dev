@@ -25,7 +25,9 @@ import java.util.Hashtable;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCoordinator;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCrisis;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtComment;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCrisisID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtGPSLocation;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLatitude;
@@ -344,18 +346,24 @@ public class DbCrises extends DbAbstract {
 					aCtCoordinator = new CtCoordinator();
 					//coordinator's id
 					DtCoordinatorID aId1 = new DtCoordinatorID(new PtString(
-							res.getString("coordiantor")));
+							res.getString("coordinator")));
 					//coordinator's login
 					DtLogin aLogin = new DtLogin(new PtString(
 							res.getString("login")));
 					//coordinator's pwd
 					DtPassword aPwd = new DtPassword(new PtString(
 							res.getString("pwd")));
+					//coordinator's first name
+					DtCoordinatorFirstName aFirstName = new DtCoordinatorFirstName(new PtString(
+							res.getString("firstName")));
+					//coordinator's last name
+					DtCoordinatorLastName aLastName = new DtCoordinatorLastName(new PtString(
+							res.getString("lastName")));
 					//coordinator's pubKey
 					DtPublicKey aPubKey = new DtPublicKey().fromString(
 							new PtString(res.getString("pubKey")));
 
-					aCtCoordinator.init(aId1, aLogin, aPwd, aPubKey);
+					aCtCoordinator.init(aId1, aLogin, aPwd, aFirstName, aLastName, aPubKey);
 
 					//add instances to the hash
 					assCtCrisisCtCoordinator.put(aCtCrisis, aCtCoordinator);

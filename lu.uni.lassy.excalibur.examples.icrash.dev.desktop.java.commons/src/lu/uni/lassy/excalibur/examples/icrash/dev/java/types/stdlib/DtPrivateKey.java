@@ -103,7 +103,7 @@ public class DtPrivateKey implements JIntIs, Serializable{
 	public PtBoolean getFromFile(PtString value) 
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
 		File file = new File("D:" + File.separator + ".icrash_rsa" + File.separator + value.getValue()+"_rsa");
-		if(!file.exists()) return null;
+		if(!file.exists()) return new PtBoolean(false);
 		String privKeyString = new String(Files.readAllBytes(Paths.get(file.getPath())));
 		fromString(new PtString(privKeyString));
 		return new PtBoolean(true);

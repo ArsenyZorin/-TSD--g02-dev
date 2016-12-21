@@ -30,7 +30,9 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtHu
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtState;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtAlertID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtComment;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCrisisID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtGPSLocation;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
@@ -356,7 +358,7 @@ public interface IcrashSystem extends Remote {
 	/**
 	 * Deletes a coordinator with the details specified.
 	 *
-	 * @param aDtCoordinatorID The coordiantor ID to delete from the system
+	 * @param aDtCoordinatorID The coordinator ID to delete from the system
 	 * @return The success of the method
 	 * @throws RemoteException Thrown if the server is offline
 	 */
@@ -370,6 +372,8 @@ public interface IcrashSystem extends Remote {
 	 */
 	public PtBoolean oeSollicitateCrisisHandling() throws RemoteException; 
 	
+	//public PtBoolean oeSaveUpdates(DtCoordinatorID aID, DtCoordinatorFirstName aFirstName, DtCoordinatorLastName aLastName) throws RemoteException;
+	
 	/**
 	 * Sets the date and time of the server to the one passed.
 	 *
@@ -377,6 +381,9 @@ public interface IcrashSystem extends Remote {
 	 * @return The success of the method
 	 * @throws RemoteException Thrown if the server is offline
 	 */
-	public PtBoolean oeSetClock(DtDateAndTime aCurrentClock) throws RemoteException; 
+	public PtBoolean oeSetClock(DtDateAndTime aCurrentClock) throws RemoteException;
+
+	public PtBoolean oeSaveUpdates(DtCoordinatorID aDtCoordinatorID, DtCoordinatorFirstName aDtCoordFirstName,
+			DtCoordinatorLastName aDtCoordLastName) throws RemoteException; 
 
 }

@@ -22,6 +22,9 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtAl
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtCrisis;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtAlertID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtComment;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCrisisID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.EtAlertStatus;
@@ -232,6 +235,33 @@ public class ActCoordinatorImpl extends ActAuthenticatedImpl implements ActCoord
 			
 		if(res.getValue() == true)
 			log.info("operation oeReportOnCrisis successfully executed by the system");
+
+
+		return res;
+
+	}
+	
+	synchronized public PtBoolean oeSaveUpdates(DtCoordinatorID aID,DtCoordinatorFirstName aDtCoordFirstName, 
+			DtCoordinatorLastName aDtCoordLastName) throws RemoteException, NotBoundException {
+		Logger log = Log4JUtils.getInstance().getLogger();
+
+		Registry registry = LocateRegistry.getRegistry(RmiUtils.getInstance().getHost(),RmiUtils.getInstance().getPort());
+			 	
+		//Gathering the remote object as it was published into the registry
+	    IcrashSystem iCrashSys_Server = (IcrashSystem)registry.lookup("iCrashServer");
+		//set up ActAuthenticated instance that performs the request
+		iCrashSys_Server.setCurrentRequestingAuthenticatedActor(this);
+		
+		
+		//set up ActAuthenticated instance that performs the request
+		iCrashSys_Server.setCurrentRequestingAuthenticatedActor(this);
+
+		log.info("message ActCoordinator.oeSaveUpdates sent to system");
+		PtBoolean res = iCrashSys_Server.oeSaveUpdates(aID, aDtCoordFirstName, aDtCoordLastName);
+			
+			
+		if(res.getValue() == true)
+			log.info("operation oeSaveUpdates successfully executed by the system");
 
 
 		return res;

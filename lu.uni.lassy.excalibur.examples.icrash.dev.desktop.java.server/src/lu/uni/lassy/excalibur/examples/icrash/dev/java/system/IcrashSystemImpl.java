@@ -49,7 +49,9 @@ import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtKe
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.CtState;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtAlertID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtComment;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorFirstName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorID;
+import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCoordinatorLastName;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtCrisisID;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtGPSLocation;
 import lu.uni.lassy.excalibur.examples.icrash.dev.java.system.types.primary.DtLogin;
@@ -127,7 +129,7 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 	/**  A hashtable of the joint class types and actors in the system, stored by their class type as a key. */
 	Hashtable<CtAuthenticated, ActAuthenticated> assCtAuthenticatedActAuthenticated = new Hashtable<CtAuthenticated, ActAuthenticated>();
 	
-	/**  A hashtable of the joint class coordinators and actors coordiantors in the system, stored by their class type. */
+	/**  A hashtable of the joint class coordinators and actors coordinators in the system, stored by their class type. */
 	Hashtable<CtCoordinator, ActCoordinator> assCtCoordinatorActCoordinator = new Hashtable<CtCoordinator, ActCoordinator>();
 	
 	/**  A hashtable of the joint crises and coordinators in the system, stored by their crisis as a key. */
@@ -1215,7 +1217,10 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 
 			//PostF2
 			CtCoordinator ctCoordinator = new CtCoordinator();
-			ctCoordinator.init(aDtCoordinatorID, aDtLogin, aDtPassword, aDtPublicKey);
+			ctCoordinator.init(aDtCoordinatorID, aDtLogin, aDtPassword, 
+					new DtCoordinatorFirstName(new PtString(" ")),
+					new DtCoordinatorLastName(new PtString(" ")), 
+					aDtPublicKey);
 			DbCoordinators.insertCoordinator(ctCoordinator);
 			
 			
@@ -1284,7 +1289,7 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 			if (ctAuth != null && ctAuth instanceof CtCoordinator){
 				CtCoordinator aCtCoordinator = (CtCoordinator)ctAuth;
 				CtCoordinator oldCoordinator = new CtCoordinator();
-				oldCoordinator.init(aCtCoordinator.id, aCtCoordinator.login, aCtCoordinator.pwd, aCtCoordinator.publKey);
+				oldCoordinator.init(aCtCoordinator.id, aCtCoordinator.login, aCtCoordinator.pwd, aCtCoordinator.firstName, aCtCoordinator.lastName, aCtCoordinator.publKey);
 				aCtCoordinator.update(aDtLogin, aDtPassword);
 				if (DbCoordinators.updateCoordinator(aCtCoordinator).getValue()){
 					cmpSystemCtAuthenticated.remove(oldCoordinator.login.value.getValue());
@@ -1349,6 +1354,34 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 			throw new Exception("There are no unhandled crisises that have exceeded the handling delay");
 	}
     
+	/*public PtBoolean oeSaveUpdates(DtCoordinatorID aID, DtCoordinatorFirstName aFirstName, DtCoordinatorLastName aLastName){
+		return new PtBoolean(true);
+		/*try {
+			//PreP1
+			isSystemStarted();
+			//PreP2
+			isUserLoggedIn();
+			CtAuthenticated ctAuth = getCtCoordinator(aID);
+			if (ctAuth != null && ctAuth instanceof CtCoordinator){
+				CtCoordinator aCtCoordinator = (CtCoordinator)ctAuth;
+				CtCoordinator oldCoordinator = new CtCoordinator();
+				oldCoordinator.init(aCtCoordinator.id, aCtCoordinator.login, aCtCoordinator.pwd, aCtCoordinator.firstName, aCtCoordinator.lastName, aCtCoordinator.publKey);
+				aCtCoordinator.update(aFirstName, aLastName);
+				if (DbCoordinators.updateCoordinator(aCtCoordinator).getValue()){
+					cmpSystemCtAuthenticated.remove(oldCoordinator.login.value.getValue());
+					cmpSystemCtAuthenticated.put(aCtCoordinator.login.value.getValue(), aCtCoordinator);
+					return new PtBoolean(true);
+				}
+				else
+					aCtCoordinator.update(oldCoordinator.firstName, oldCoordinator.lastName);
+			}
+			return new PtBoolean(false);
+		} catch (Exception e) {
+			log.error("The error was received during updating the coordinator information" + e);
+			return new PtBoolean(false);
+		}*/
+	//}
+	
 	/* (non-Javadoc)
 	 * @see lu.uni.lassy.excalibur.examples.icrash.dev.java.system.IcrashSystem#oeSetClock(lu.uni.lassy.excalibur.examples.icrash.dev.java.types.stdlib.DtDateAndTime)
 	 */
@@ -1370,5 +1403,35 @@ public class IcrashSystemImpl extends UnicastRemoteObject implements
 			log.error("Exception in oeSetClock..." + ex);
 			return new PtBoolean(false);
 		}
+	}
+
+	@Override
+	public PtBoolean oeSaveUpdates(DtCoordinatorID aDtCoordinatorID, DtCoordinatorFirstName aDtCoordinatorFirstName,
+			DtCoordinatorLastName aDtCoordinatorLastName) throws RemoteException {
+		try{
+			//PreP1
+			isSystemStarted();
+			CtAuthenticated ctAuth = getCtCoordinator(aDtCoordinatorID);
+			if (ctAuth != null && ctAuth instanceof CtCoordinator){
+			//CtCoordinator aCtCoordinator = (CtCoordinator) currentRequestingAuthenticatedActor;
+				CtCoordinator aCtCoordinator = (CtCoordinator)ctAuth;
+				CtCoordinator oldCoordinator = new CtCoordinator();
+				oldCoordinator.init(aCtCoordinator.id, aCtCoordinator.login, aCtCoordinator.pwd, aCtCoordinator.firstName, aCtCoordinator.lastName, aCtCoordinator.publKey);
+				aCtCoordinator.update(aDtCoordinatorFirstName, aDtCoordinatorLastName);
+				if (DbCoordinators.updateCoordinator(aCtCoordinator).getValue()){
+					cmpSystemCtAuthenticated.remove(oldCoordinator.login.value.getValue());
+					cmpSystemCtAuthenticated.put(aCtCoordinator.login.value.getValue(), aCtCoordinator);
+					//ActAdministrator admin = (ActAdministrator) currentRequestingAuthenticatedActor;
+					//admin.ieCoordinatorUpdated();
+					return new PtBoolean(true);
+				}
+				else
+					aCtCoordinator.update(oldCoordinator.firstName, oldCoordinator.lastName);
+			}
+			return new PtBoolean(false);
+		} catch (Exception e) {
+			log.error("Exception in oeSaveUpdates..." + e);
+			return new PtBoolean(false);
+		}		
 	}
 }
